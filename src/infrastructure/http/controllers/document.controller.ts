@@ -1,122 +1,120 @@
 import type { Request, Response } from "express";
-import {
-  toDocumentResponse,
-  toDocumentSummaryResponse,
-  type MockDocumentLike,
-} from "../mappers/document.mapper";
+import { ERROR_STATUS } from "../../../application/errors";
+import type { DocumentService } from "../../../application/documents/document.service.types";
+import { toDocumentResponse, toDocumentSummaryResponse } from "../mappers/document.mapper";
 
-const NOT_FOUND_ID = "000000000000000000000404";
-const FINALIZED_ID = "000000000000000000000409";
-
-function notFound(res: Response): void {
-  res.status(404).json({
-    error: { code: "DOCUMENT_NOT_FOUND", message: "Document not found" },
-  });
+export interface DocumentController {
+  list(req: Request, res: Response): Promise<void>;
+  create(req: Request, res: Response): Promise<void>;
+  getOne(req: Request, res: Response): Promise<void>;
+  patch(req: Request, res: Response): Promise<void>;
+  delete(req: Request, res: Response): Promise<void>;
+  addLine(req: Request, res: Response): Promise<void>;
+  patchLine(req: Request, res: Response): Promise<void>;
+  deleteLine(req: Request, res: Response): Promise<void>;
+  finalize(req: Request, res: Response): Promise<void>;
+  duplicate(req: Request, res: Response): Promise<void>;
 }
 
-function finalized(res: Response): void {
-  res.status(409).json({
-    error: {
-      code: "FINALIZED_DOCUMENT_IMMUTABLE",
-      message: "Document is finalized and cannot be modified",
+export function createDocumentController(documentService: DocumentService): DocumentController {
+  return {
+    async list(req, res): Promise<void> {
+      const result = await documentService.list(req.user!.id);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(result.value.map(toDocumentSummaryResponse));
     },
-  });
-}
 
-const happyMock: MockDocumentLike = {
-  id: "000000000000000000000111",
-  title: "Sample quote",
-  customer: "Acme Corp",
-  issueDate: "2025-01-15T00:00:00.000Z",
-  status: "draft",
-  lines: [
-    {
-      id: "000000000000000000000aa1",
-      description: "Widget A",
-      quantity: 2,
-      unitPriceCents: 10000,
-      discount: { type: "percent", percentBp: 1000 },
-      taxBp: 500,
-      lineSubtotalCents: 20000,
-      discountAmountCents: 2000,
-      taxAmountCents: 900,
-      lineTotalCents: 18900,
+    async create(req, res): Promise<void> {
+      const result = await documentService.create(req.user!.id, req.body);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(201).json(toDocumentResponse(result.value));
     },
-  ],
-  subtotalCents: 20000,
-  totalDiscountCents: 2000,
-  totalTaxCents: 900,
-  grandTotalCents: 18900,
-  createdAt: "2025-01-10T12:00:00.000Z",
-  updatedAt: "2025-01-10T12:00:00.000Z",
-};
 
-function checkId(id: string, res: Response): boolean {
-  if (id === NOT_FOUND_ID) {
-    notFound(res);
-    return true;
-  }
-  if (id === FINALIZED_ID) {
-    finalized(res);
-    return true;
-  }
-  return false;
+    async getOne(req, res): Promise<void> {
+      const result = await documentService.findOne(req.user!.id, req.params.id);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(toDocumentResponse(result.value));
+    },
+
+    async patch(req, res): Promise<void> {
+      const result = await documentService.patch(req.user!.id, req.params.id, req.body);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(toDocumentResponse(result.value));
+    },
+
+    async delete(req, res): Promise<void> {
+      const result = await documentService.delete(req.user!.id, req.params.id);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(204).end();
+    },
+
+    async addLine(req, res): Promise<void> {
+      const result = await documentService.addLine(req.user!.id, req.params.id, req.body);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(201).json(toDocumentResponse(result.value));
+    },
+
+    async patchLine(req, res): Promise<void> {
+      const result = await documentService.patchLine(
+        req.user!.id,
+        req.params.id,
+        req.params.lineId,
+        req.body,
+      );
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(toDocumentResponse(result.value));
+    },
+
+    async deleteLine(req, res): Promise<void> {
+      const result = await documentService.deleteLine(
+        req.user!.id,
+        req.params.id,
+        req.params.lineId,
+      );
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(toDocumentResponse(result.value));
+    },
+
+    async finalize(req, res): Promise<void> {
+      const result = await documentService.finalize(req.user!.id, req.params.id);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(toDocumentResponse(result.value));
+    },
+
+    async duplicate(req, res): Promise<void> {
+      const result = await documentService.duplicate(req.user!.id, req.params.id);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(201).json(toDocumentResponse(result.value));
+    },
+  };
 }
-
-export const documentController = {
-  list(_req: Request, res: Response): void {
-    res.status(200).json([toDocumentSummaryResponse(happyMock)]);
-  },
-
-  create(req: Request, res: Response): void {
-    res.status(201).json(toDocumentResponse({ ...happyMock, title: (req.body as { title?: string }).title ?? happyMock.title }));
-  },
-
-  getOne(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(200).json(toDocumentResponse(happyMock));
-  },
-
-  patch(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(200).json(toDocumentResponse(happyMock));
-  },
-
-  delete(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(204).end();
-  },
-
-  addLine(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(201).json(toDocumentResponse(happyMock));
-  },
-
-  patchLine(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(200).json(toDocumentResponse(happyMock));
-  },
-
-  deleteLine(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(200).json(toDocumentResponse(happyMock));
-  },
-
-  finalize(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(200).json(toDocumentResponse({ ...happyMock, status: "finalized" }));
-  },
-
-  duplicate(req: Request, res: Response): void {
-    const id = (req.params as { id: string }).id;
-    if (checkId(id, res)) return;
-    res.status(201).json(toDocumentResponse({ ...happyMock, status: "draft" }));
-  },
-};

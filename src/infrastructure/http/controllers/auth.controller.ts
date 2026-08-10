@@ -1,32 +1,30 @@
 import type { Request, Response } from "express";
+import { ERROR_STATUS } from "../../../application/errors";
+import type { AuthService } from "../../../application/auth/auth.service.types";
 
-const SENTINEL_NOT_FOUND = "000000000000000000000404";
-const SENTINEL_EMAIL_TAKEN = "000000000000000000000409";
+export interface AuthController {
+  signup(req: Request, res: Response): Promise<void>;
+  login(req: Request, res: Response): Promise<void>;
+}
 
-export const authController = {
-  signup(req: Request, res: Response): void {
-    const body = req.body as { email?: string; password?: string };
-    if (body.email === `taken+${SENTINEL_EMAIL_TAKEN}@example.com`) {
-      res.status(409).json({
-        error: {
-          code: "EMAIL_ALREADY_REGISTERED",
-          message: "Email already registered",
-        },
-      });
-      return;
-    }
-    res.status(201).json({
-      userId: "00000000000000000000000a",
-      email: body.email,
-      token: "mock.signup.token",
-    });
-  },
+export function createAuthController(authService: AuthService): AuthController {
+  return {
+    async signup(req, res): Promise<void> {
+      const result = await authService.signup(req.body);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(201).json(result.value);
+    },
 
-  login(_req: Request, res: Response): void {
-    res.status(200).json({
-      userId: "00000000000000000000000a",
-      email: "user@example.com",
-      token: "mock.login.token",
-    });
-  },
-};
+    async login(req, res): Promise<void> {
+      const result = await authService.login(req.body);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(result.value);
+    },
+  };
+}

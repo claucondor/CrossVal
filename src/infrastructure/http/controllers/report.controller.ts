@@ -1,15 +1,21 @@
 import type { Request, Response } from "express";
+import { ERROR_STATUS } from "../../../application/errors";
+import type { ReportService } from "../../../application/reports/report.service.types";
 
-export const reportController = {
-  summary(req: Request, res: Response): void {
-    const { from, to } = req.query as { from: string; to: string };
-    res.status(200).json({
-      from,
-      to,
-      documentCount: 0,
-      grandTotalCents: 0,
-      totalTaxCents: 0,
-      totalDiscountCents: 0,
-    });
-  },
-};
+export interface ReportController {
+  summary(req: Request, res: Response): Promise<void>;
+}
+
+export function createReportController(reportService: ReportService): ReportController {
+  return {
+    async summary(req, res): Promise<void> {
+      const { from, to } = req.query as { from: string; to: string };
+      const result = await reportService.summary(req.user!.id, from, to);
+      if (result.isErr()) {
+        res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
+        return;
+      }
+      res.status(200).json(result.value);
+    },
+  };
+}

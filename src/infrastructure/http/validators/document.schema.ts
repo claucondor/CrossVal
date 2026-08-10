@@ -5,6 +5,17 @@ const objectId = z
   .string()
   .refine((v) => Types.ObjectId.isValid(v), { message: "invalid ObjectId" });
 
+// Per SDD §2.3: a human percent whose `percent * 100` is not within 1e-9 of
+// an integer (e.g. 7.333) must be rejected with INVALID_PERCENT. Validation
+// lives ONLY at the HTTP frontier; `percentToBp` keeps its current contract.
+const percentValue = z
+  .number()
+  .min(0)
+  .max(100)
+  .refine((v) => Math.abs(v * 100 - Math.round(v * 100)) < 1e-9, {
+    message: "INVALID_PERCENT",
+  });
+
 const fixedDiscount = z
   .object({
     type: z.literal("fixed"),
@@ -15,7 +26,7 @@ const fixedDiscount = z
 const percentDiscount = z
   .object({
     type: z.literal("percent"),
-    percent: z.number().min(0).max(100),
+    percent: percentValue,
   })
   .strict();
 
@@ -36,7 +47,7 @@ const LineItemInputSchema = z
     quantity: z.number().int().min(1).max(10_000),
     unitPriceCents: z.number().int().min(0).max(10_000_000),
     discount: DiscountSchema.optional(),
-    taxPercent: z.number().min(0).max(100).optional(),
+    taxPercent: percentValue.optional(),
   })
   .strict();
 
@@ -44,7 +55,7 @@ export const CreateDocumentSchema = z
   .object({
     title: z.string().trim().min(1).max(200),
     customer: z.string().trim().min(1).max(200),
-    issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "INVALID_DATE"),
+    issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     lines: z.array(LineItemInputSchema).max(200).optional(),
   })
   .strict();
@@ -53,10 +64,7 @@ export const PatchDocumentSchema = z
   .object({
     title: z.string().trim().min(1).max(200).optional(),
     customer: z.string().trim().min(1).max(200).optional(),
-    issueDate: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "INVALID_DATE")
-      .optional(),
+    issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   })
   .strict()
   .refine(
@@ -72,7 +80,7 @@ export const PatchLineSchema = z
     quantity: z.number().int().min(1).max(10_000).optional(),
     unitPriceCents: z.number().int().min(0).max(10_000_000).optional(),
     discount: z.union([DiscountSchema, z.null()]).optional(),
-    taxPercent: z.number().min(0).max(100).optional(),
+    taxPercent: percentValue.optional(),
   })
   .strict()
   .refine(

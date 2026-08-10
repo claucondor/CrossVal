@@ -17,6 +17,8 @@ function codeForZodMessage(message: string): string {
       return "INVALID_DATE_RANGE";
     case "INVALID_DATE":
       return "INVALID_DATE";
+    case "INVALID_PERCENT":
+      return "INVALID_PERCENT";
     case "EMPTY_PATCH":
       return "VALIDATION_ERROR";
     default:

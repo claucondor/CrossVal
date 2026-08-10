@@ -1,33 +1,26 @@
 import { Router } from "express";
-import { authController } from "../controllers/auth.controller";
+import { asyncHandler } from "../asyncHandler";
+import type { AuthController } from "../controllers/auth.controller";
 import { authRateLimit } from "../middlewares/rate-limit.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import { LoginSchema, SignupSchema } from "../validators/auth.schema";
 
-export const authRouter = Router();
+export function createAuthRouter(controller: AuthController): Router {
+  const router = Router();
 
-authRouter.post(
-  "/signup",
-  authRateLimit,
-  validate("body", SignupSchema),
-  (req, res, next) => {
-    try {
-      authController.signup(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.post(
+    "/signup",
+    authRateLimit,
+    validate("body", SignupSchema),
+    asyncHandler(controller.signup),
+  );
 
-authRouter.post(
-  "/login",
-  authRateLimit,
-  validate("body", LoginSchema),
-  (req, res, next) => {
-    try {
-      authController.login(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.post(
+    "/login",
+    authRateLimit,
+    validate("body", LoginSchema),
+    asyncHandler(controller.login),
+  );
+
+  return router;
+}

@@ -1,21 +1,20 @@
 import { Router } from "express";
-import { reportController } from "../controllers/report.controller";
+import { asyncHandler } from "../asyncHandler";
+import type { ReportController } from "../controllers/report.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import { ReportSummaryQuerySchema } from "../validators/report.schema";
 
-export const reportRouter = Router();
+export function createReportRouter(controller: ReportController): Router {
+  const router = Router();
 
-reportRouter.use(authMiddleware);
+  router.use(authMiddleware);
 
-reportRouter.get(
-  "/summary",
-  validate("query", ReportSummaryQuerySchema),
-  (req, res, next) => {
-    try {
-      reportController.summary(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.get(
+    "/summary",
+    validate("query", ReportSummaryQuerySchema),
+    asyncHandler(controller.summary),
+  );
+
+  return router;
+}

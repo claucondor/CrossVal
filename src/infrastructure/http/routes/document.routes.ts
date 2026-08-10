@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { documentController } from "../controllers/document.controller";
+import { asyncHandler } from "../asyncHandler";
+import type { DocumentController } from "../controllers/document.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import {
@@ -11,125 +12,69 @@ import {
   PatchLineSchema,
 } from "../validators/document.schema";
 
-export const documentRouter = Router();
+export function createDocumentRouter(controller: DocumentController): Router {
+  const router = Router();
 
-documentRouter.use(authMiddleware);
+  router.use(authMiddleware);
 
-documentRouter.get("/", (req, res, next) => {
-  try {
-    documentController.list(req, res);
-  } catch (e) {
-    next(e);
-  }
-});
+  router.get("/", asyncHandler(controller.list));
 
-documentRouter.post(
-  "/",
-  validate("body", CreateDocumentSchema),
-  (req, res, next) => {
-    try {
-      documentController.create(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.post(
+    "/",
+    validate("body", CreateDocumentSchema),
+    asyncHandler(controller.create),
+  );
 
-documentRouter.get(
-  "/:id",
-  validate("params", DocumentIdParamSchema),
-  (req, res, next) => {
-    try {
-      documentController.getOne(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.get(
+    "/:id",
+    validate("params", DocumentIdParamSchema),
+    asyncHandler(controller.getOne),
+  );
 
-documentRouter.patch(
-  "/:id",
-  validate("params", DocumentIdParamSchema),
-  validate("body", PatchDocumentSchema),
-  (req, res, next) => {
-    try {
-      documentController.patch(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.patch(
+    "/:id",
+    validate("params", DocumentIdParamSchema),
+    validate("body", PatchDocumentSchema),
+    asyncHandler(controller.patch),
+  );
 
-documentRouter.delete(
-  "/:id",
-  validate("params", DocumentIdParamSchema),
-  (req, res, next) => {
-    try {
-      documentController.delete(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.delete(
+    "/:id",
+    validate("params", DocumentIdParamSchema),
+    asyncHandler(controller.delete),
+  );
 
-documentRouter.post(
-  "/:id/lines",
-  validate("params", DocumentIdParamSchema),
-  validate("body", CreateLineSchema),
-  (req, res, next) => {
-    try {
-      documentController.addLine(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.post(
+    "/:id/lines",
+    validate("params", DocumentIdParamSchema),
+    validate("body", CreateLineSchema),
+    asyncHandler(controller.addLine),
+  );
 
-documentRouter.patch(
-  "/:id/lines/:lineId",
-  validate("params", DocumentLineParamsSchema),
-  validate("body", PatchLineSchema),
-  (req, res, next) => {
-    try {
-      documentController.patchLine(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.patch(
+    "/:id/lines/:lineId",
+    validate("params", DocumentLineParamsSchema),
+    validate("body", PatchLineSchema),
+    asyncHandler(controller.patchLine),
+  );
 
-documentRouter.delete(
-  "/:id/lines/:lineId",
-  validate("params", DocumentLineParamsSchema),
-  (req, res, next) => {
-    try {
-      documentController.deleteLine(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.delete(
+    "/:id/lines/:lineId",
+    validate("params", DocumentLineParamsSchema),
+    asyncHandler(controller.deleteLine),
+  );
 
-documentRouter.post(
-  "/:id/finalize",
-  validate("params", DocumentIdParamSchema),
-  (req, res, next) => {
-    try {
-      documentController.finalize(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.post(
+    "/:id/finalize",
+    validate("params", DocumentIdParamSchema),
+    asyncHandler(controller.finalize),
+  );
 
-documentRouter.post(
-  "/:id/duplicate",
-  validate("params", DocumentIdParamSchema),
-  (req, res, next) => {
-    try {
-      documentController.duplicate(req, res);
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+  router.post(
+    "/:id/duplicate",
+    validate("params", DocumentIdParamSchema),
+    asyncHandler(controller.duplicate),
+  );
+
+  return router;
+}
