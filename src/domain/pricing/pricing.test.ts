@@ -214,7 +214,7 @@ describe("PricingEngine — T1..T15 (SDD §6.3)", () => {
       taxBp: 0,
     });
     expect(unitOver.isErr()).toBe(true);
-    if (unitOver.isErr()) expect(unitOver.error.code).toBe("AMOUNT_LIMIT_EXCEEDED");
+    if (unitOver.isErr()) expect(unitOver.error.code).toBe("INVALID_UNIT_PRICE");
   });
 
   test("T15 — non-integer inputs → INVALID_QUANTITY / INVALID_UNIT_PRICE", () => {

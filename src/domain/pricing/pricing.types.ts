@@ -26,7 +26,6 @@ export type PricingErrorCode = Extract<
   | "INVALID_PERCENT"
   | "INVALID_DISCOUNT_VALUE"
   | "DISCOUNT_EXCEEDS_SUBTOTAL"
-  | "AMOUNT_LIMIT_EXCEEDED"
 >;
 
 export interface PricingError {
