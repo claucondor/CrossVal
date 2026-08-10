@@ -59,7 +59,7 @@ export const CreateDocumentSchema = z
     title: z.string().trim().min(1).max(200),
     customer: z.string().trim().min(1).max(200),
     issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    lines: z.array(LineItemInputSchema).max(200).optional(),
+    lines: z.array(LineItemInputSchema).max(200, { message: "TOO_MANY_LINES" }).optional(),
   })
   .strict();
 

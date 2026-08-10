@@ -24,6 +24,8 @@ function codeForZodMessage(message: string): string {
       return "INVALID_DISCOUNT_SHAPE";
     case "INVALID_DISCOUNT_VALUE":
       return "INVALID_DISCOUNT_VALUE";
+    case "TOO_MANY_LINES":
+      return "TOO_MANY_LINES";
     case "STATUS_NOT_PATCHABLE":
       return "STATUS_NOT_PATCHABLE";
     case "EMPTY_PATCH":
