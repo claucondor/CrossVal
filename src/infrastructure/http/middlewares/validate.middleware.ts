@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import type { ZodTypeAny } from "zod";
+import { ERROR_STATUS, type AppErrorCode } from "../../../application/errors";
 
 type Source = "body" | "params" | "query";
 
@@ -19,8 +20,18 @@ function codeForZodMessage(message: string): string {
       return "INVALID_DATE";
     case "INVALID_PERCENT":
       return "INVALID_PERCENT";
+    case "INVALID_DISCOUNT_SHAPE":
+      return "INVALID_DISCOUNT_SHAPE";
+    case "INVALID_DISCOUNT_VALUE":
+      return "INVALID_DISCOUNT_VALUE";
+    case "STATUS_NOT_PATCHABLE":
+      return "STATUS_NOT_PATCHABLE";
     case "EMPTY_PATCH":
       return "VALIDATION_ERROR";
+    case "INVALID_OBJECT_ID":
+      // Internal signal from the ObjectId refine; the middleware rewrites it
+      // into a real AppErrorCode (DOCUMENT_NOT_FOUND / LINE_NOT_FOUND) below.
+      return "INVALID_OBJECT_ID";
     default:
       return "VALIDATION_ERROR";
   }
@@ -34,8 +45,16 @@ export function validate(source: Source, schema: ZodTypeAny) {
       const zErr = parsed.error as ZodError;
       const issue = zErr.issues[0];
       const field = issue ? fieldFromPath(issue.path) : "(root)";
-      const code = codeForZodMessage(issue?.message ?? "");
-      res.status(422).json({
+      const rawCode = codeForZodMessage(issue?.message ?? "");
+      // Per §4.1.6: an invalid `:id` / `:lineId` is treated as "not found",
+      // never as 422 — so the request shape itself never leaks the difference.
+      const code: AppErrorCode =
+        rawCode === "INVALID_OBJECT_ID"
+          ? field === "lineId"
+            ? "LINE_NOT_FOUND"
+            : "DOCUMENT_NOT_FOUND"
+          : (rawCode as AppErrorCode);
+      res.status(ERROR_STATUS[code]).json({
         error: {
           code,
           message: issue?.message ?? "Validation failed",

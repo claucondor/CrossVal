@@ -38,8 +38,8 @@ interface LineSource {
   existingId: Types.ObjectId | undefined;
 }
 
-function discountDtoToDomain(dto: LineDiscountDto): Discount {
-  if (dto === null) return null;
+function discountDtoToDomain(dto: LineDiscountDto | undefined): Discount {
+  if (dto === null || dto === undefined) return null;
   if (dto.type === "fixed") return { type: "fixed", amountCents: dto.amountCents };
   return { type: "percent", percentBp: percentToBp(dto.percent) };
 }
@@ -49,7 +49,7 @@ function lineInputDtoToDomain(line: CreateDocumentInput["lines"][number]): LineI
     quantity: line.quantity,
     unitPriceCents: line.unitPriceCents,
     discount: discountDtoToDomain(line.discount),
-    taxBp: percentToBp(line.taxPercent),
+    taxBp: percentToBp(line.taxPercent ?? 0),
   };
 }
 
@@ -168,7 +168,8 @@ function mapWriteOutcome(
 export function createDocumentService(repository: DocumentRepository): DocumentService {
   return {
     async create(userId, input): Promise<Result<DocumentResult, AppError>> {
-      const lineInputs: LineInput[] = input.lines.map(lineInputDtoToDomain);
+      const inputLines = input.lines ?? [];
+      const lineInputs: LineInput[] = inputLines.map(lineInputDtoToDomain);
 
       const calc = calculateDocument(lineInputs);
       if (calc.isErr()) {
@@ -176,7 +177,7 @@ export function createDocumentService(repository: DocumentRepository): DocumentS
       }
       const { lines: calculatedLines, totals } = calc.value;
 
-      const storedLines: StoredLine[] = input.lines.map((line, i) =>
+      const storedLines: StoredLine[] = inputLines.map((line, i) =>
         buildStoredLine(line.description, lineInputs[i], calculatedLines[i]),
       );
 
