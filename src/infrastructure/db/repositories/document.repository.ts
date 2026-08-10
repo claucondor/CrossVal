@@ -1,4 +1,5 @@
-import type { DocumentDoc } from "../models/document.model";
+import mongoose from "mongoose";
+import { DocumentModel, type DocumentDoc } from "../models/document.model";
 
 export interface NewDocumentInput {
   title: string;
@@ -49,29 +50,123 @@ export interface DocumentRepository {
 }
 
 export class MongoDocumentRepository implements DocumentRepository {
-  create(_userId: string, _doc: NewDocumentInput): Promise<DocumentDoc> {
-    return Promise.reject(new Error("not implemented"));
+  async create(userId: string, doc: NewDocumentInput): Promise<DocumentDoc> {
+    const created = await DocumentModel.create({
+      ...doc,
+      userId,
+    });
+    return created.toObject() as DocumentDoc;
   }
-  findOneForUser(_userId: string, _id: string): Promise<DocumentDoc | null> {
-    return Promise.reject(new Error("not implemented"));
+
+  async findOneForUser(userId: string, id: string): Promise<DocumentDoc | null> {
+    try {
+      const doc = await DocumentModel.findOne({ _id: id, userId });
+      if (!doc) return null;
+      return doc.toObject() as DocumentDoc;
+    } catch (err) {
+      if (err instanceof mongoose.Error.CastError) {
+        return null;
+      }
+      throw err;
+    }
   }
-  listForUser(_userId: string): Promise<DocumentDoc[]> {
-    return Promise.reject(new Error("not implemented"));
+
+  listForUser(userId: string): Promise<DocumentDoc[]> {
+    return DocumentModel.find({ userId })
+      .sort({ issueDate: -1, createdAt: -1 })
+      .lean()
+      .exec() as unknown as Promise<DocumentDoc[]>;
   }
-  updateDraft(
-    _userId: string,
-    _id: string,
-    _patch: DraftPatch,
+
+  async updateDraft(
+    userId: string,
+    id: string,
+    patch: DraftPatch,
   ): Promise<WriteOutcome<DocumentDoc>> {
-    return Promise.reject(new Error("not implemented"));
+    const updated = await DocumentModel.findOneAndUpdate(
+      { _id: id, userId, status: "draft" },
+      patch,
+      { new: true, runValidators: true },
+    );
+    if (updated) {
+      return { kind: "updated", doc: updated.toObject() as DocumentDoc };
+    }
+    const existing = await DocumentModel.findOne({ _id: id, userId }).select("status");
+    if (!existing) {
+      return { kind: "not_found" };
+    }
+    return { kind: "finalized" };
   }
-  deleteDraft(_userId: string, _id: string): Promise<WriteOutcome<null>> {
-    return Promise.reject(new Error("not implemented"));
+
+  async deleteDraft(userId: string, id: string): Promise<WriteOutcome<null>> {
+    const deleted = await DocumentModel.findOneAndDelete({
+      _id: id,
+      userId,
+      status: "draft",
+    });
+    if (deleted) {
+      return { kind: "updated", doc: null };
+    }
+    const existing = await DocumentModel.findOne({ _id: id, userId }).select("status");
+    if (!existing) {
+      return { kind: "not_found" };
+    }
+    return { kind: "finalized" };
   }
-  finalize(_userId: string, _id: string): Promise<WriteOutcome<DocumentDoc>> {
-    return Promise.reject(new Error("not implemented"));
+
+  async finalize(userId: string, id: string): Promise<WriteOutcome<DocumentDoc>> {
+    const updated = await DocumentModel.findOneAndUpdate(
+      { _id: id, userId, status: "draft" },
+      { status: "finalized" },
+      { new: true, runValidators: true },
+    );
+    if (updated) {
+      return { kind: "updated", doc: updated.toObject() as DocumentDoc };
+    }
+    const existing = await DocumentModel.findOne({ _id: id, userId }).select("status");
+    if (!existing) {
+      return { kind: "not_found" };
+    }
+    return { kind: "finalized" };
   }
-  summary(_userId: string, _from: Date, _to: Date): Promise<SummaryTotals> {
-    return Promise.reject(new Error("not implemented"));
+
+  async summary(userId: string, from: Date, to: Date): Promise<SummaryTotals> {
+    const result = await DocumentModel.aggregate<{
+      documentCount: number;
+      grandTotalCents: number;
+      totalTaxCents: number;
+      totalDiscountCents: number;
+    }>([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          issueDate: { $gte: from, $lte: to },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          documentCount: { $sum: 1 },
+          grandTotalCents: { $sum: "$grandTotalCents" },
+          totalTaxCents: { $sum: "$totalTaxCents" },
+          totalDiscountCents: { $sum: "$totalDiscountCents" },
+        },
+      },
+    ]);
+    const row = result[0];
+    if (!row) {
+      return {
+        documentCount: 0,
+        grandTotalCents: 0,
+        totalTaxCents: 0,
+        totalDiscountCents: 0,
+      };
+    }
+    return {
+      documentCount: row.documentCount,
+      grandTotalCents: row.grandTotalCents,
+      totalTaxCents: row.totalTaxCents,
+      totalDiscountCents: row.totalDiscountCents,
+    };
   }
 }

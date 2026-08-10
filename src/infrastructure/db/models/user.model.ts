@@ -18,8 +18,6 @@ const userSchema = new Schema(
   { timestamps: true, versionKey: false },
 );
 
-userSchema.index({ email: 1 }, { unique: true });
-
 userSchema.set("toJSON", {
   transform: (_doc, ret: Record<string, unknown>) => {
     delete ret.passwordHash;

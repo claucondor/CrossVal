@@ -1,4 +1,4 @@
-import { ok, err } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import { roundHalfUp } from "./money";
 import type {
   CalculateDocumentErr,
@@ -9,7 +9,9 @@ import type {
   PricingError,
 } from "./pricing.types";
 
-export function calculateLine(input: LineInput) {
+export function calculateLine(
+  input: LineInput,
+): Result<LineResult, PricingError> {
   const { quantity, unitPriceCents, discount, taxBp } = input;
 
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10_000) {
@@ -101,7 +103,9 @@ export function calculateDocumentTotals(lines: LineResult[]): DocumentTotals {
   };
 }
 
-export function calculateDocument(lines: LineInput[]) {
+export function calculateDocument(
+  lines: LineInput[],
+): Result<CalculateDocumentOk, CalculateDocumentErr> {
   const results: LineResult[] = [];
   for (let i = 0; i < lines.length; i++) {
     const result = calculateLine(lines[i]);
