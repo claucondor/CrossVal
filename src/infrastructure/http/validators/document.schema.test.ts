@@ -1,13 +1,6 @@
 import request from "supertest";
-
-// `app.ts` evaluates `loadEnv()` at module-load time. setup-env.ts sets
-// BCRYPT_ROUNDS to "4" for fast bcrypt in tests, but env.ts requires >=10.
-// We patch the env var HERE, before requiring `../app`, so that env.ts sees a
-// valid value. TypeScript hoists `import` statements, so we use require() to
-// preserve source order.
-process.env.BCRYPT_ROUNDS = "10";
-const { createApp } = require("../app");
-const { startMongo, stopMongo, clearMongo } = require("../../../test-utils/mongo");
+import { createApp } from "../app";
+import { startMongo, stopMongo, clearMongo } from "../../../test-utils/mongo";
 
 const app = createApp();
 
