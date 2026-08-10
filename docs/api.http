@@ -1,0 +1,243 @@
+### CrossVal — Multi-Rate Pricing Calculator API (HTTP examples)
+### Phase 0: skeleton — controllers return hardcoded mocks with the shapes of SDD §5.3.
+### Sentinel IDs:
+###   :id = 000000000000000000000404 → 404 DOCUMENT_NOT_FOUND
+###   :id = 000000000000000000000409 → 409 FINALIZED_DOCUMENT_IMMUTABLE
+###
+### Variable placeholder: set @token after a real signup/login (Phase 3+).
+
+@host = http://127.0.0.1:3000
+@token = REPLACE_WITH_JWT
+
+
+### ---------- Health ----------
+
+### 200 OK — public
+GET {{host}}/health
+
+
+### ---------- Auth ----------
+
+### 201 Created
+POST {{host}}/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "correcthorsebatterystaple"
+}
+
+### 409 EMAIL_ALREADY_REGISTERED — sentinel email pattern
+POST {{host}}/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email": "taken+000000000000000000000409@example.com",
+  "password": "correcthorsebatterystaple"
+}
+
+### 422 VALIDATION_ERROR — invalid email
+POST {{host}}/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "short"
+}
+
+### 200 OK
+POST {{host}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "correcthorsebatterystaple"
+}
+
+
+### ---------- Documents ----------
+
+### 200 OK — list
+GET {{host}}/api/v1/documents
+Authorization: Bearer {{token}}
+
+### 201 Created
+POST {{host}}/api/v1/documents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Sample quote",
+  "customer": "Acme Corp",
+  "issueDate": "2025-01-15",
+  "lines": [
+    {
+      "description": "Widget A",
+      "quantity": 2,
+      "unitPriceCents": 10000,
+      "discount": { "type": "percent", "percent": 10 },
+      "taxPercent": 5
+    }
+  ]
+}
+
+### 422 VALIDATION_ERROR — body with forbidden total field (BR-10)
+POST {{host}}/api/v1/documents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Bad",
+  "customer": "Acme",
+  "issueDate": "2025-01-15",
+  "grandTotalCents": 1
+}
+
+### 422 INVALID_DISCOUNT_SHAPE — discount with both fixed and percent keys (BR-2)
+POST {{host}}/api/v1/documents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Bad",
+  "customer": "Acme",
+  "issueDate": "2025-01-15",
+  "lines": [
+    {
+      "description": "x",
+      "quantity": 1,
+      "unitPriceCents": 100,
+      "discount": { "type": "fixed", "amountCents": 5, "percent": 10 }
+    }
+  ]
+}
+
+### 422 INVALID_PERCENT — percent with more than 2 decimals
+POST {{host}}/api/v1/documents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Bad",
+  "customer": "Acme",
+  "issueDate": "2025-01-15",
+  "lines": [
+    {
+      "description": "x",
+      "quantity": 1,
+      "unitPriceCents": 100,
+      "taxPercent": 7.333
+    }
+  ]
+}
+
+### 200 OK — get one
+GET {{host}}/api/v1/documents/000000000000000000000111
+Authorization: Bearer {{token}}
+
+### 404 DOCUMENT_NOT_FOUND — sentinel id
+GET {{host}}/api/v1/documents/000000000000000000000404
+Authorization: Bearer {{token}}
+
+### 200 OK — patch
+PATCH {{host}}/api/v1/documents/000000000000000000000111
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Updated title"
+}
+
+### 422 STATUS_NOT_PATCHABLE — status in PATCH body (BR-13)
+PATCH {{host}}/api/v1/documents/000000000000000000000111
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "finalized"
+}
+
+### 409 FINALIZED_DOCUMENT_IMMUTABLE — sentinel id
+PATCH {{host}}/api/v1/documents/000000000000000000000409
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "X"
+}
+
+### 204 No Content — delete
+DELETE {{host}}/api/v1/documents/000000000000000000000111
+Authorization: Bearer {{token}}
+
+### 409 FINALIZED_DOCUMENT_IMMUTABLE — delete on finalized
+DELETE {{host}}/api/v1/documents/000000000000000000000409
+Authorization: Bearer {{token}}
+
+### 201 Created — add line
+POST {{host}}/api/v1/documents/000000000000000000000111/lines
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Service fee",
+  "quantity": 1,
+  "unitPriceCents": 20000,
+  "discount": { "type": "fixed", "amountCents": 2000 },
+  "taxPercent": 0
+}
+
+### 200 OK — patch line
+PATCH {{host}}/api/v1/documents/000000000000000000000111/lines/000000000000000000000aa1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### 200 OK — delete line (returns full document, not 204)
+DELETE {{host}}/api/v1/documents/000000000000000000000111/lines/000000000000000000000aa1
+Authorization: Bearer {{token}}
+
+### 200 OK — finalize
+POST {{host}}/api/v1/documents/000000000000000000000111/finalize
+Authorization: Bearer {{token}}
+
+### 409 FINALIZED_DOCUMENT_IMMUTABLE — finalize sentinel
+POST {{host}}/api/v1/documents/000000000000000000000409/finalize
+Authorization: Bearer {{token}}
+
+### 201 Created — duplicate
+POST {{host}}/api/v1/documents/000000000000000000000111/duplicate
+Authorization: Bearer {{token}}
+
+
+### ---------- Reports ----------
+
+### 200 OK — summary
+GET {{host}}/api/v1/reports/summary?from=2025-01-01&to=2025-12-31
+Authorization: Bearer {{token}}
+
+### 422 INVALID_DATE_RANGE — from > to
+GET {{host}}/api/v1/reports/summary?from=2025-12-31&to=2025-01-01
+Authorization: Bearer {{token}}
+
+### 422 INVALID_DATE_RANGE — missing from
+GET {{host}}/api/v1/reports/summary?to=2025-12-31
+Authorization: Bearer {{token}}
+
+### 422 INVALID_DATE — bad format
+GET {{host}}/api/v1/reports/summary?from=2024-13-01&to=2025-12-31
+Authorization: Bearer {{token}}
+
+
+### ---------- Error shape (sanity) ----------
+
+### 404 ROUTE_NOT_FOUND
+GET {{host}}/api/v1/does-not-exist
+Authorization: Bearer {{token}}
+
+### 401 UNAUTHENTICATED — (Phase 0 stub middleware injects a fake user; becomes 401 in Phase 3)
+### Without Authorization header, in Phase 0 this still passes authMiddleware (stub), so the
+### response comes from the controller. In Phase 3 the real middleware returns 401.
