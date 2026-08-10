@@ -1,0 +1,13 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+dev-docs
+tests
+coverage
+*.test.ts
+.git
+.gitignore
+CLAUDE.md
+npm-debug.log

@@ -8,7 +8,7 @@ async function main(): Promise<void> {
 
   app.listen(env.PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`[server] listening on http://127.0.0.1:${env.PORT} (${env.NODE_ENV})`);
+    console.log(`[server] listening on port ${env.PORT} (${env.NODE_ENV})`);
   });
 }
 
