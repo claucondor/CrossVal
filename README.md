@@ -63,11 +63,12 @@ Run this block as-is (`bash`, requires `curl` and `jq`) against the live deploym
 
 ```bash
 BASE="https://cr-4e1f5aa146b04065be04da1150ecb6f8.ecs.us-east-2.on.aws"
+EMAIL="reviewer+$(date +%s)@example.com"
 
 # 1. Sign up
 TOKEN=$(curl -s -X POST "$BASE/api/v1/auth/signup" \
   -H "Content-Type: application/json" \
-  -d '{"email":"quickstart@example.com","password":"password-1234"}' | jq -r '.token')
+  -d "{\"email\":\"$EMAIL\",\"password\":\"password-1234\"}" | jq -r '.token')
 
 # 2. Create a document with the exact 3 lines from SDD §6.2
 DOC=$(curl -s -X POST "$BASE/api/v1/documents" \
@@ -117,7 +118,7 @@ Expected:
 ```json
 { "from": "2025-09-01", "to": "2025-09-01", "documentCount": 1, "grandTotalCents": 42150, "totalTaxCents": 1150, "totalDiscountCents": 4000 }
 ```
-(`documentCount` will be higher than 1 if this block has already been run before with the same date — each run creates a new document, and the report aggregates every document owned by that account in range. Re-run with a different `email` and `issueDate` for a clean result.)
+(`EMAIL` is generated fresh on every run via `$(date +%s)`, so each run signs up a new account and `documentCount` is always 1 — the report aggregates every document owned by that account in range.)
 
 ## Calculation & rounding policy
 
