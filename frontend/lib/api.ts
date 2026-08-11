@@ -26,7 +26,8 @@ export async function apiFetch<T>(
     ...(session ? { Authorization: `Bearer ${session.value}` } : {}),
   };
 
-  const res = await fetch(`${baseUrl}${path}`, {
+  const normalizedBase = baseUrl.replace(/\/$/, "");
+  const res = await fetch(`${normalizedBase}/api/v1${path}`, {
     ...init,
     headers,
     cache: "no-store",
