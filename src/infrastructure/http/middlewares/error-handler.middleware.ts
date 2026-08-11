@@ -57,7 +57,10 @@ export function errorHandler(
 
   // Fallback: never expose stack or internal messages (SDD §5.5 INTERNAL_ERROR).
   // eslint-disable-next-line no-console
-  console.error("[error-handler] unhandled error:", err);
+  console.error(
+    "[error-handler] unhandled error:",
+    err instanceof Error ? err.message : String(err),
+  );
   res.status(ERROR_STATUS.INTERNAL_ERROR).json({
     error: {
       code: "INTERNAL_ERROR",
