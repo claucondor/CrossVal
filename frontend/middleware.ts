@@ -1,8 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-// Stub. The real route-protection logic (see frontend-sdd §3.3) belongs to
-// Fase 1, outside this nightly goal. For now, let every request through.
-export function middleware() {
+const SESSION_COOKIE = "session";
+const PUBLIC_PATHS: ReadonlySet<string> = new Set(["/login", "/signup"]);
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (PUBLIC_PATHS.has(pathname)) {
+    return NextResponse.next();
+  }
+
+  const session = request.cookies.get(SESSION_COOKIE);
+
+  if (!session) {
+    const loginUrl = new URL("/login", request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
   return NextResponse.next();
 }
 

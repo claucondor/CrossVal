@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import Input from "../../../components/Input";
-import Button from "../../../components/Button";
+
+import SignupForm from "./SignupForm";
 
 export default function SignupPage() {
   return (
@@ -16,28 +14,7 @@ export default function SignupPage() {
             Start tracking documents with CrossVal.
           </p>
         </div>
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <Input
-            type="email"
-            name="email"
-            label="Email"
-            required
-            autoComplete="email"
-          />
-          <Input
-            type="password"
-            name="password"
-            label="Password"
-            hint="At least 8 characters"
-            required
-            minLength={8}
-            autoComplete="new-password"
-          />
-          <Button type="submit">Sign up</Button>
-        </form>
+        <SignupForm />
         <p className="text-sm text-text-muted">
           Already have an account?{" "}
           <Link href="/login" className="text-accent hover:underline">

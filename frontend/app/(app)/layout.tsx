@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { logoutAction } from "../../actions/auth.actions";
+
 export default function AppLayout({
   children,
 }: Readonly<{
@@ -15,7 +17,7 @@ export default function AppLayout({
             <Link href="/reports">Reports</Link>
           </nav>
         </div>
-        <form>
+        <form action={logoutAction}>
           <button type="submit" className="text-sm">
             Log out
           </button>
