@@ -38,7 +38,11 @@ export type WriteOutcome<T> =
 export interface DocumentRepository {
   create(userId: string, doc: NewDocumentInput): Promise<DocumentDoc>;
   findOneForUser(userId: string, id: string): Promise<DocumentDoc | null>;
-  listForUser(userId: string): Promise<DocumentDoc[]>;
+  listForUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ items: DocumentDoc[]; total: number }>;
   updateDraft(
     userId: string,
     id: string,
@@ -71,11 +75,22 @@ export class MongoDocumentRepository implements DocumentRepository {
     }
   }
 
-  listForUser(userId: string): Promise<DocumentDoc[]> {
-    return DocumentModel.find({ userId })
-      .sort({ issueDate: -1, createdAt: -1 })
-      .lean()
-      .exec() as unknown as Promise<DocumentDoc[]>;
+  async listForUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ items: DocumentDoc[]; total: number }> {
+    const filter = { userId };
+    const [items, total] = await Promise.all([
+      DocumentModel.find(filter)
+        .sort({ issueDate: -1, createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec() as unknown as Promise<DocumentDoc[]>,
+      DocumentModel.countDocuments(filter).exec(),
+    ]);
+    return { items, total };
   }
 
   async updateDraft(

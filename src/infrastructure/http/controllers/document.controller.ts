@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { ERROR_STATUS } from "../../../application/errors";
 import type { DocumentService } from "../../../application/documents/document.service.types";
-import { toDocumentResponse, toDocumentSummaryResponse } from "../mappers/document.mapper";
+import { toDocumentListResponse, toDocumentResponse } from "../mappers/document.mapper";
 
 export interface DocumentController {
   list(req: Request, res: Response): Promise<void>;
@@ -19,12 +19,13 @@ export interface DocumentController {
 export function createDocumentController(documentService: DocumentService): DocumentController {
   return {
     async list(req, res): Promise<void> {
-      const result = await documentService.list(req.user!.id);
+      const { page, limit } = req.query as unknown as { page: number; limit: number };
+      const result = await documentService.list(req.user!.id, page, limit);
       if (result.isErr()) {
         res.status(ERROR_STATUS[result.error.code]).json({ error: result.error });
         return;
       }
-      res.status(200).json(result.value.map(toDocumentSummaryResponse));
+      res.status(200).json(toDocumentListResponse(result.value));
     },
 
     async create(req, res): Promise<void> {

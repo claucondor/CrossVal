@@ -1,6 +1,7 @@
 import { bpToPercent } from "../../../domain/pricing/money";
 import type {
   DocumentResult,
+  DocumentSummaryPage,
   DocumentSummaryResult,
   LineDiscount,
   LineDiscountDto,
@@ -98,5 +99,23 @@ export function toDocumentSummaryResponse(doc: DocumentSummaryResult): DocumentS
     grandTotalCents: doc.grandTotalCents,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
+  };
+}
+
+export interface DocumentListResponse {
+  items: DocumentSummaryResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export function toDocumentListResponse(page: DocumentSummaryPage): DocumentListResponse {
+  return {
+    items: page.items.map(toDocumentSummaryResponse),
+    page: page.page,
+    limit: page.limit,
+    total: page.total,
+    totalPages: page.totalPages,
   };
 }

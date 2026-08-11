@@ -172,7 +172,7 @@ describe("cross-user isolation — listing (BR-17)", () => {
       .set("Authorization", `Bearer ${tokenB}`);
 
     expect(res.status).toBe(200);
-    const summaries = res.body as DocumentSummaryResponse[];
+    const summaries = res.body.items as DocumentSummaryResponse[];
     const ids = summaries.map((d) => d.id);
     expect(ids).not.toContain(docIdA);
   });

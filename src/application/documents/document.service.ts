@@ -18,6 +18,7 @@ import type {
   LineDiscountDto,
   LineItemResult,
 } from "./document.service.types";
+import type { DocumentSummaryPage } from "./document.service.types";
 
 interface StoredLine {
   _id?: Types.ObjectId;
@@ -201,9 +202,15 @@ export function createDocumentService(repository: DocumentRepository): DocumentS
       return ok(serialiseDocument(doc));
     },
 
-    async list(userId): Promise<Result<DocumentSummaryResult[], AppError>> {
-      const docs = await repository.listForUser(userId);
-      return ok(docs.map(serialiseSummary));
+    async list(userId, page, limit): Promise<Result<DocumentSummaryPage, AppError>> {
+      const { items, total } = await repository.listForUser(userId, page, limit);
+      return ok({
+        items: items.map(serialiseSummary),
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      });
     },
 
     async patch(userId, id, patch): Promise<Result<DocumentResult, AppError>> {

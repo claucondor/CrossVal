@@ -57,6 +57,14 @@ export interface DocumentSummaryResult {
   updatedAt: string;
 }
 
+export interface DocumentSummaryPage {
+  items: DocumentSummaryResult[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface CreateDocumentInput {
   title: string;
   customer: string;
@@ -90,7 +98,11 @@ export interface DocumentService {
     input: CreateDocumentInput,
   ): Promise<Result<DocumentResult, AppError>>;
   findOne(userId: string, id: string): Promise<Result<DocumentResult, AppError>>;
-  list(userId: string): Promise<Result<DocumentSummaryResult[], AppError>>;
+  list(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<Result<DocumentSummaryPage, AppError>>;
   patch(
     userId: string,
     id: string,
