@@ -2,6 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../asyncHandler";
 import type { DocumentController } from "../controllers/document.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { generalRateLimit } from "../middlewares/rate-limit.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import {
   CreateDocumentSchema,
@@ -15,6 +16,7 @@ import {
 export function createDocumentRouter(controller: DocumentController): Router {
   const router = Router();
 
+  router.use(generalRateLimit);
   router.use(authMiddleware);
 
   router.get("/", asyncHandler(controller.list));
