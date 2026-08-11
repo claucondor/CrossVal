@@ -202,8 +202,8 @@ The same pattern secures every other mutation on `documents` (`updateDraft`, `de
 ## What would be improved before real production use
 
 - Refresh tokens (today, a token that expires means signing in again — there's no rotation).
-- Global rate limiting / WAF (today the only rate limit is on `/api/v1/auth/*`).
-- Pagination and filters on `GET /documents` (today it returns every document owned by the caller, unbounded).
+- WAF (rate limiting is in place: `/api/v1/auth/*` at 10 req/15min, and `/api/v1/documents/*` + `/api/v1/reports/*` at 100 req/15min, both per IP, both returning `429 RATE_LIMITED`).
+- Pagination on `GET /documents` (today it returns every document owned by the caller, unbounded — measured live: 4 documents → 925 response bytes, ~231 bytes/document, growing linearly with no upper bound). The `page`/`limit` contract and the `DocumentListResponse` shape are already specified in `dev-docs/backend-sdd.md` §5.1/§5.3; implementation is pending (dev-plan Fase 6). Filters are not specified and remain out of scope.
 - `Decimal128` / multi-currency support if the system ever needs more than one currency.
 - Audit log / change history on documents.
 - Explicit optimistic locking (today concurrency safety relies entirely on the conditional-write pattern above, which is correct but doesn't surface a version number to clients).
