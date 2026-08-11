@@ -73,20 +73,6 @@ function getMockDocument(): DocumentResponse {
   };
 }
 
-// Mock separado para probar el camino de solo lectura. Si en una fase futura
-// el id "doc_001" debe mostrar un documento finalizado, basta con ramificar
-// aquí.
-function getMockFinalizedDocument(): DocumentResponse {
-  return {
-    ...getMockDocument(),
-    id: "doc_001",
-    title: "Q1 services — Acme Corp",
-    customer: "Acme Corp",
-    issueDate: "2026-01-15",
-    status: "finalized",
-  };
-}
-
 function toLineInput(line: LineItemResponse): LineItemInput {
   return {
     description: line.description,
@@ -165,15 +151,6 @@ export default function DocumentDetailPage({
   // No-op actions — backend wiring is a later phase.
   const handleConfirm = () => {
     closeDialog();
-  };
-
-  // Para probar el camino de solo lectura sin cambiar el mock por defecto,
-  // expongo un toggle local (no es parte del SDD, es solo utilidad de dev).
-  const toggleMockToFinalized = () => {
-    setDoc(getMockFinalizedDocument());
-  };
-  const toggleMockToDraft = () => {
-    setDoc(getMockDocument());
   };
 
   return (
@@ -328,47 +305,19 @@ export default function DocumentDetailPage({
         </div>
       </section>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {isDraft ? (
-            <Button onClick={() => setDialog("finalize")}>Finalize</Button>
-          ) : null}
-          <Button
-            variant="secondary"
-            onClick={() => setDialog("duplicate")}
-          >
-            Duplicate
-          </Button>
-          <Button variant="danger" onClick={() => setDialog("delete")}>
-            Delete
-          </Button>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-text-muted">
-          {/*
-            Toggle de dev para ver el camino "finalized" sin tocar el mock por
-            defecto. NO es parte del contrato del SDD — solo utilidad de
-            desarrollo. Lo dejo visible para que el build ejercicio ambas
-            ramas de UI.
-          */}
-          <span>Dev:</span>
-          {isDraft ? (
-            <button
-              type="button"
-              onClick={toggleMockToFinalized}
-              className="underline hover:text-text"
-            >
-              switch to finalized mock
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={toggleMockToDraft}
-              className="underline hover:text-text"
-            >
-              switch to draft mock
-            </button>
-          )}
-        </div>
+      <div className="flex items-center gap-2">
+        {isDraft ? (
+          <Button onClick={() => setDialog("finalize")}>Finalize</Button>
+        ) : null}
+        <Button
+          variant="secondary"
+          onClick={() => setDialog("duplicate")}
+        >
+          Duplicate
+        </Button>
+        <Button variant="danger" onClick={() => setDialog("delete")}>
+          Delete
+        </Button>
       </div>
 
       <ConfirmDialog
