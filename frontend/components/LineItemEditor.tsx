@@ -1,33 +1,14 @@
 "use client";
 
-// TODO: usar formatCents/parseCentsInput de lib/money.ts (tarea C5).
-// Por ahora los importes se muestran y editan como string en centavos
-// sin aritmética de dinero en el componente (prohibido parseFloat(x)*100
-// o cualquier operación de dinero aquí). No importar de lib/types.ts
-// (esa tarea es C4, en paralelo).
-
 import Input from "./Input";
 import Select from "./Select";
 import Button from "./Button";
-
-// Forma local de la línea de documento (alineada con LineItemInput de
-// backend-sdd.md §5.2). Re-declarada aquí para no depender de lib/types.ts.
-type DiscountDto =
-  | null
-  | { type: "fixed"; amountCents: number }
-  | { type: "percent"; percent: number };
-
-interface LocalLine {
-  description: string;
-  quantity: number;
-  unitPriceCents: number;
-  discount: DiscountDto;
-  taxPercent: number;
-}
+import { formatCents, parseCentsInput } from "../lib/money";
+import type { LineItemInput } from "../lib/types";
 
 interface Props {
-  line: LocalLine;
-  onChange: (line: LocalLine) => void;
+  line: LineItemInput;
+  onChange: (line: LineItemInput) => void;
   onRemove: () => void;
 }
 
@@ -45,7 +26,9 @@ export default function LineItemEditor({
   onRemove,
 }: Props) {
   const discountType: DiscountType =
-    line.discount === null ? "none" : line.discount.type;
+    line.discount === null || line.discount === undefined
+      ? "none"
+      : line.discount.type;
 
   const handleDiscountTypeChange = (newType: string) => {
     if (newType === "none") {
@@ -53,41 +36,51 @@ export default function LineItemEditor({
     } else if (newType === "fixed") {
       onChange({
         ...line,
-        discount: { type: "fixed", amountCents: 0 },
+        discount: { type: "fixed", amountCents: line.discount?.type === "fixed" ? line.discount.amountCents : 0 },
       });
     } else if (newType === "percent") {
       onChange({
         ...line,
-        discount: { type: "percent", percent: 0 },
+        discount: { type: "percent", percent: line.discount?.type === "percent" ? line.discount.percent : 0 },
       });
     }
   };
 
   const handleDiscountValueChange = (newValue: string) => {
     if (line.discount?.type === "fixed") {
+      const parsed = parseCentsInput(newValue);
       onChange({
         ...line,
         discount: {
           type: "fixed",
-          amountCents: parseInt(newValue, 10) || 0,
+          amountCents: parsed ?? line.discount.amountCents,
         },
       });
     } else if (line.discount?.type === "percent") {
+      const parsed = parseFloat(newValue);
       onChange({
         ...line,
         discount: {
           type: "percent",
-          percent: parseFloat(newValue) || 0,
+          percent: Number.isFinite(parsed) ? parsed : line.discount.percent,
         },
       });
     }
   };
 
+  const handleUnitPriceChange = (newValue: string) => {
+    const parsed = parseCentsInput(newValue);
+    onChange({
+      ...line,
+      unitPriceCents: parsed ?? line.unitPriceCents,
+    });
+  };
+
   const discountValue =
-    line.discount === null
+    line.discount === null || line.discount === undefined
       ? ""
       : line.discount.type === "fixed"
-        ? String(line.discount.amountCents)
+        ? formatCents(line.discount.amountCents)
         : String(line.discount.percent);
 
   return (
@@ -118,15 +111,10 @@ export default function LineItemEditor({
       <div className="col-span-2">
         <Input
           type="text"
-          inputMode="numeric"
-          aria-label="Unit price (cents)"
-          value={String(line.unitPriceCents)}
-          onChange={(e) =>
-            onChange({
-              ...line,
-              unitPriceCents: parseInt(e.target.value, 10) || 0,
-            })
-          }
+          inputMode="decimal"
+          aria-label="Unit price"
+          value={formatCents(line.unitPriceCents)}
+          onChange={(e) => handleUnitPriceChange(e.target.value)}
         />
       </div>
       <div className="col-span-2">
@@ -141,7 +129,7 @@ export default function LineItemEditor({
         {line.discount ? (
           <Input
             type="text"
-            inputMode="decimal"
+            inputMode={line.discount.type === "fixed" ? "decimal" : "decimal"}
             aria-label="Discount value"
             value={discountValue}
             onChange={(e) => handleDiscountValueChange(e.target.value)}
@@ -155,7 +143,7 @@ export default function LineItemEditor({
           min={0}
           max={100}
           aria-label="Tax percent"
-          value={line.taxPercent}
+          value={line.taxPercent ?? 0}
           onChange={(e) =>
             onChange({
               ...line,
