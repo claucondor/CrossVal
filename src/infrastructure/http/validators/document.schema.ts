@@ -111,3 +111,18 @@ export type CreateDocumentDto = z.infer<typeof CreateDocumentSchema>;
 export type PatchDocumentDto = z.infer<typeof PatchDocumentSchema>;
 export type CreateLineDto = z.infer<typeof CreateLineSchema>;
 export type PatchLineDto = z.infer<typeof PatchLineSchema>;
+
+export const ListDocumentsQuerySchema = z
+  .object({
+    page: z
+      .string()
+      .optional()
+      .transform((v) => (v === undefined ? 1 : Number(v)))
+      .refine((v) => Number.isInteger(v) && v >= 1, { message: "INVALID_PAGINATION" }),
+    limit: z
+      .string()
+      .optional()
+      .transform((v) => (v === undefined ? 20 : Number(v)))
+      .refine((v) => Number.isInteger(v) && v >= 1 && v <= 100, { message: "INVALID_PAGINATION" }),
+  })
+  .strict("INVALID_PAGINATION");

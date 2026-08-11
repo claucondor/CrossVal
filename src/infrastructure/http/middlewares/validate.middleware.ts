@@ -16,6 +16,8 @@ function codeForZodMessage(message: string): string {
   switch (message) {
     case "INVALID_DATE_RANGE":
       return "INVALID_DATE_RANGE";
+    case "INVALID_PAGINATION":
+      return "INVALID_PAGINATION";
     case "INVALID_DATE":
       return "VALIDATION_ERROR";
     case "INVALID_PERCENT":

@@ -20,6 +20,7 @@ export type AppErrorCode =
   | "DOCUMENT_HAS_NO_LINES"
   | "STATUS_NOT_PATCHABLE"
   | "INVALID_DATE_RANGE"
+  | "INVALID_PAGINATION"
   | "RATE_LIMITED"
   | "INTERNAL_ERROR";
 
@@ -51,6 +52,7 @@ export const ERROR_STATUS: Record<AppErrorCode, number> = {
   DOCUMENT_HAS_NO_LINES: 422,
   STATUS_NOT_PATCHABLE: 422,
   INVALID_DATE_RANGE: 422,
+  INVALID_PAGINATION: 422,
   RATE_LIMITED: 429,
   INTERNAL_ERROR: 500,
 };
@@ -77,6 +79,7 @@ export const ERROR_MESSAGES: Record<AppErrorCode, string> = {
   DOCUMENT_HAS_NO_LINES: "Document has no lines and cannot be finalized",
   STATUS_NOT_PATCHABLE: "Status cannot be changed via PATCH; use the finalize endpoint",
   INVALID_DATE_RANGE: "from and to must be valid YYYY-MM-DD dates with from <= to",
+  INVALID_PAGINATION: "page must be an integer >= 1 and limit an integer in [1, 100]",
   RATE_LIMITED: "Too many auth requests; try again later",
   INTERNAL_ERROR: "Internal server error",
 };

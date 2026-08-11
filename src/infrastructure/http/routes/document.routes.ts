@@ -9,6 +9,7 @@ import {
   CreateLineSchema,
   DocumentIdParamSchema,
   DocumentLineParamsSchema,
+  ListDocumentsQuerySchema,
   PatchDocumentSchema,
   PatchLineSchema,
 } from "../validators/document.schema";
@@ -19,7 +20,11 @@ export function createDocumentRouter(controller: DocumentController): Router {
   router.use(generalRateLimit);
   router.use(authMiddleware);
 
-  router.get("/", asyncHandler(controller.list));
+  router.get(
+    "/",
+    validate("query", ListDocumentsQuerySchema),
+    asyncHandler(controller.list),
+  );
 
   router.post(
     "/",
