@@ -48,7 +48,7 @@ export function authMiddleware(
 
   let payload: JwtPayload;
   try {
-    payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    payload = jwt.verify(token, env.JWT_SECRET, { algorithms: ["HS256"] }) as JwtPayload;
   } catch {
     res.status(ERROR_STATUS.UNAUTHENTICATED).json({
       error: {
