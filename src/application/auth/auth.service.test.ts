@@ -80,4 +80,46 @@ describe("AuthService.login", () => {
       expect(r.error.message).toBe("Invalid email or password");
     }
   });
+
+  describe("timing side-channel (existing vs non-existent email)", () => {
+    const TIMING_BCRYPT_ROUNDS = 10;
+    let timingService: AuthService;
+
+    beforeAll(() => {
+      timingService = createAuthService({
+        userRepository: new MongoUserRepository(),
+        jwtSecret: JWT_SECRET,
+        jwtExpiresIn: JWT_EXPIRES_IN,
+        bcryptRounds: TIMING_BCRYPT_ROUNDS,
+      });
+    });
+
+    test("both paths return INVALID_CREDENTIALS with comparable latency (bcrypt.compare runs on both)", async () => {
+      await timingService.signup({ email: "timing@example.com", password: "password123" });
+
+      const startExisting = performance.now();
+      const rExisting = await timingService.login({
+        email: "timing@example.com",
+        password: "wrong-password",
+      });
+      const existingMs = performance.now() - startExisting;
+
+      const startMissing = performance.now();
+      const rMissing = await timingService.login({
+        email: "does-not-exist@example.com",
+        password: "wrong-password",
+      });
+      const missingMs = performance.now() - startMissing;
+
+      expect(rExisting.isErr()).toBe(true);
+      expect(rMissing.isErr()).toBe(true);
+      if (rExisting.isErr()) expect(rExisting.error.code).toBe("INVALID_CREDENTIALS");
+      if (rMissing.isErr()) expect(rMissing.error.code).toBe("INVALID_CREDENTIALS");
+
+      // Before the fix, the missing-user path skipped bcrypt entirely and
+      // returned in ~1.3s less time than the existing-user path. Both paths
+      // must now pay the same bcrypt cost, so the gap should be small.
+      expect(Math.abs(existingMs - missingMs)).toBeLessThan(300);
+    });
+  });
 });

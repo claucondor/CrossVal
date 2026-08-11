@@ -27,6 +27,10 @@ function signToken(userId: string, secret: string, expiresIn: string): string {
 
 export function createAuthService(options: CreateAuthServiceOptions): AuthService {
   const { userRepository, jwtSecret, jwtExpiresIn, bcryptRounds } = options;
+  // Precomputed at the same cost as real password hashes, so login for a
+  // nonexistent email still pays the bcrypt cost — otherwise the missing
+  // compare is a timing side-channel that reveals which emails are registered.
+  const dummyPasswordHash = bcrypt.hashSync("dummy-password-for-timing-safety", bcryptRounds);
 
   return {
     async signup(input): Promise<Result<AuthServiceSignupOk, AppError>> {
@@ -51,12 +55,12 @@ export function createAuthService(options: CreateAuthServiceOptions): AuthServic
       const email = input.email.trim().toLowerCase();
       const userDoc = await userRepository.findByEmail(email);
 
-      if (!userDoc || !userDoc.passwordHash) {
-        return err(INVALID_CREDENTIALS_ERROR);
-      }
+      const passwordMatches = await bcrypt.compare(
+        input.password,
+        userDoc?.passwordHash ?? dummyPasswordHash,
+      );
 
-      const passwordMatches = await bcrypt.compare(input.password, userDoc.passwordHash);
-      if (!passwordMatches) {
+      if (!userDoc || !userDoc.passwordHash || !passwordMatches) {
         return err(INVALID_CREDENTIALS_ERROR);
       }
 
