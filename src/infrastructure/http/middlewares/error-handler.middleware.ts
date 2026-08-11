@@ -7,10 +7,16 @@ interface HttpErrorLike extends Error {
   type?: string;
 }
 
+const KNOWN_ERROR_CODES = new Set(Object.keys(ERROR_STATUS));
+
 function isAppError(value: unknown): value is AppError {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Record<string, unknown>;
-  return typeof v.code === "string" && typeof v.message === "string";
+  return (
+    typeof v.code === "string" &&
+    KNOWN_ERROR_CODES.has(v.code) &&
+    typeof v.message === "string"
+  );
 }
 
 export function errorHandler(
