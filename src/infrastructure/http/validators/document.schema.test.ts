@@ -309,17 +309,19 @@ describe("PATCH /api/v1/documents/:id — STATUS_NOT_PATCHABLE (BR-13)", () => {
 });
 
 describe("ObjectId inválido en params (§4.1.6 — mismo tratamiento que no existe)", () => {
-  test("GET /documents/no-es-un-objectid → 404 DOCUMENT_NOT_FOUND, field id", async () => {
+  test("GET /documents/no-es-un-objectid → 404 DOCUMENT_NOT_FOUND, byte-identical to a real not-found (no field)", async () => {
     const res = await request(app)
       .get("/api/v1/documents/no-es-un-objectid")
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe("DOCUMENT_NOT_FOUND");
-    expect(res.body.error.field).toBe("id");
+    expect(res.body.error).toEqual({
+      code: "DOCUMENT_NOT_FOUND",
+      message: "Document not found",
+    });
   });
 
-  test("PATCH /documents/<válido>/lines/no-es-un-objectid → 404 LINE_NOT_FOUND, field lineId", async () => {
+  test("PATCH /documents/<válido>/lines/no-es-un-objectid → 404 LINE_NOT_FOUND, byte-identical to a real not-found (no field)", async () => {
     const validId = new Types.ObjectId().toString();
 
     const res = await request(app)
@@ -328,17 +330,21 @@ describe("ObjectId inválido en params (§4.1.6 — mismo tratamiento que no exi
       .send({ description: "x" });
 
     expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe("LINE_NOT_FOUND");
-    expect(res.body.error.field).toBe("lineId");
+    expect(res.body.error).toEqual({
+      code: "LINE_NOT_FOUND",
+      message: "Line not found",
+    });
   });
 
-  test("DELETE /documents/no-es-un-objectid → 404 DOCUMENT_NOT_FOUND, field id", async () => {
+  test("DELETE /documents/no-es-un-objectid → 404 DOCUMENT_NOT_FOUND, byte-identical to a real not-found (no field)", async () => {
     const res = await request(app)
       .delete("/api/v1/documents/no-es-un-objectid")
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe("DOCUMENT_NOT_FOUND");
-    expect(res.body.error.field).toBe("id");
+    expect(res.body.error).toEqual({
+      code: "DOCUMENT_NOT_FOUND",
+      message: "Document not found",
+    });
   });
 });

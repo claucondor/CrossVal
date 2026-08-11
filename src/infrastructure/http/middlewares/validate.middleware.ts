@@ -50,18 +50,18 @@ export function validate(source: Source, schema: ZodTypeAny) {
       const rawCode = codeForZodMessage(issue?.message ?? "");
       // Per §4.1.6: an invalid `:id` / `:lineId` is treated as "not found",
       // never as 422 — so the request shape itself never leaks the difference.
-      const code: AppErrorCode =
-        rawCode === "INVALID_OBJECT_ID"
-          ? field === "lineId"
-            ? "LINE_NOT_FOUND"
-            : "DOCUMENT_NOT_FOUND"
-          : (rawCode as AppErrorCode);
+      // The response must be byte-identical to a genuinely nonexistent
+      // resource: same code, same message, and no `field` either.
+      const isObjectIdRewrite = rawCode === "INVALID_OBJECT_ID";
+      const code: AppErrorCode = isObjectIdRewrite
+        ? field === "lineId"
+          ? "LINE_NOT_FOUND"
+          : "DOCUMENT_NOT_FOUND"
+        : (rawCode as AppErrorCode);
       res.status(ERROR_STATUS[code]).json({
-        error: {
-          code,
-          message: ERROR_MESSAGES[code],
-          field,
-        },
+        error: isObjectIdRewrite
+          ? { code, message: ERROR_MESSAGES[code] }
+          : { code, message: ERROR_MESSAGES[code], field },
       });
       return;
     }

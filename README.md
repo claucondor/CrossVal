@@ -12,7 +12,7 @@ A backend service for creating quotes/invoices ("documents") with multiple line 
 - Zod for request validation
 - `neverthrow` for typed error handling (`Result<T, E>`, no exceptions for business errors — see [ARCHITECTURE.md](./ARCHITECTURE.md))
 - Jest + Supertest + `mongodb-memory-server` for testing
-- Deployed as a container on AWS App Runner, image hosted on Amazon ECR
+- Deployed as a container on Amazon ECS (Express Mode), image hosted on Amazon ECR
 
 ## Prerequisites
 
@@ -56,6 +56,68 @@ npm run lint           # eslint
 ```
 
 Coverage of `src/domain/pricing/` is 100% (statements, branches, functions, lines). Project-wide coverage is above 85% statements / 71% branches.
+
+## Quick verification
+
+Run this block as-is (`bash`, requires `curl` and `jq`) against the live deployment to see the brief's worked example end-to-end. Change only the `BASE` line to point at a different environment.
+
+```bash
+BASE="https://cr-4e1f5aa146b04065be04da1150ecb6f8.ecs.us-east-2.on.aws"
+
+# 1. Sign up
+TOKEN=$(curl -s -X POST "$BASE/api/v1/auth/signup" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"quickstart@example.com","password":"password-1234"}' | jq -r '.token')
+
+# 2. Create a document with the exact 3 lines from SDD §6.2
+DOC=$(curl -s -X POST "$BASE/api/v1/documents" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{
+    "title": "Quick verification quote",
+    "customer": "ACME Co.",
+    "issueDate": "2025-09-01",
+    "lines": [
+      {"description":"Widget A","quantity":2,"unitPriceCents":10000,"discount":{"type":"percent","percent":10},"taxPercent":5},
+      {"description":"Widget B","quantity":1,"unitPriceCents":5000,"discount":null,"taxPercent":5},
+      {"description":"Service fee","quantity":1,"unitPriceCents":20000,"discount":{"type":"fixed","amountCents":2000},"taxPercent":0}
+    ]
+  }')
+DOC_ID=$(echo "$DOC" | jq -r '.id')
+echo "$DOC" | jq '{subtotalCents, totalDiscountCents, totalTaxCents, grandTotalCents}'
+```
+Expected:
+```json
+{ "subtotalCents": 45000, "totalDiscountCents": 4000, "totalTaxCents": 1150, "grandTotalCents": 42150 }
+```
+
+```bash
+# 3. Finalize it
+curl -s -X POST "$BASE/api/v1/documents/$DOC_ID/finalize" -H "Authorization: Bearer $TOKEN" | jq '{status}'
+```
+Expected: `{ "status": "finalized" }`
+
+```bash
+# 4. Try to edit it — a finalized document is immutable
+curl -s -w "\nHTTP %{http_code}\n" -X PATCH "$BASE/api/v1/documents/$DOC_ID" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"title":"too late"}'
+```
+Expected:
+```
+{"error":{"code":"FINALIZED_DOCUMENT_IMMUTABLE","message":"Document is finalized and cannot be modified"}}
+HTTP 409
+```
+
+```bash
+# 5. Summary report for that date
+curl -s -G "$BASE/api/v1/reports/summary" -H "Authorization: Bearer $TOKEN" \
+  --data-urlencode "from=2025-09-01" --data-urlencode "to=2025-09-01" | jq .
+```
+Expected:
+```json
+{ "from": "2025-09-01", "to": "2025-09-01", "documentCount": 1, "grandTotalCents": 42150, "totalTaxCents": 1150, "totalDiscountCents": 4000 }
+```
+(`documentCount` will be higher than 1 if this block has already been run before with the same date — each run creates a new document, and the report aggregates every document owned by that account in range. Re-run with a different `email` and `issueDate` for a clean result.)
 
 ## Calculation & rounding policy
 
@@ -144,12 +206,12 @@ The same pattern secures every other mutation on `documents` (`updateDraft`, `de
 - `Decimal128` / multi-currency support if the system ever needs more than one currency.
 - Audit log / change history on documents.
 - Explicit optimistic locking (today concurrency safety relies entirely on the conditional-write pattern above, which is correct but doesn't surface a version number to clients).
-- Observability: structured logging, request tracing, metrics/alerts beyond the App Runner health check.
+- Observability: structured logging, request tracing, metrics/alerts beyond the ECS health check.
 
 ## Deployment
 
 - Container: multi-stage `Dockerfile` (build stage compiles TypeScript with `devDependencies`; runtime stage is `node:20-slim` with only production `dependencies`, running as a non-root user).
 - Image registry: Amazon ECR (`crossval-api`, `us-east-2`).
-- Runtime: AWS App Runner, deployed from the ECR image, `PORT` injected by App Runner itself (not set manually), health check on `GET /health`.
+- Runtime: Amazon ECS (Express Mode), deployed from the ECR image, health check on `GET /health`.
 - Database: MongoDB Atlas (not DocumentDB — see [ARCHITECTURE.md](./ARCHITECTURE.md) for why).
-- Secrets (`JWT_SECRET`, `MONGODB_URI`) are set as App Runner environment variables, never baked into the image or committed to the repository.
+- Secrets (`JWT_SECRET`, `MONGODB_URI`) are set as ECS task environment variables, never baked into the image or committed to the repository.
