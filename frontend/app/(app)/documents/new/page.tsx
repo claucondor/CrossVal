@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import Input from "../../../../components/Input";
 import Button from "../../../../components/Button";
 import LineItemEditor from "../../../../components/LineItemEditor";
 import DocumentTotals from "../../../../components/DocumentTotals";
+import { createDocumentAction } from "../../../../actions/document.actions";
 import type { LineItemInput } from "../../../../lib/types";
 
 function emptyLine(): LineItemInput {
@@ -23,6 +24,12 @@ export default function NewDocumentPage() {
   const [customer, setCustomer] = useState("");
   const [issueDate, setIssueDate] = useState("");
   const [lines, setLines] = useState<LineItemInput[]>([emptyLine()]);
+  const [error, setError] = useState<{
+    code: string;
+    message: string;
+    field?: string;
+  } | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const handleAddLine = () => {
     setLines((prev) => [...prev, emptyLine()]);
@@ -37,10 +44,30 @@ export default function NewDocumentPage() {
   };
 
   const handleSave = () => {
-    // No real action yet — backend wiring is a later phase. Per §4.3 of the
-    // SDD, totals would be returned by the server in the real implementation;
-    // they are intentionally 0 here.
+    setError(null);
+    startTransition(async () => {
+      const result = await createDocumentAction({
+        title,
+        customer,
+        issueDate,
+        lines,
+      });
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
   };
+
+  const titleFieldError = error?.field === "title" ? error.message : undefined;
+  const customerFieldError =
+    error?.field === "customer" ? error.message : undefined;
+  const issueDateFieldError =
+    error?.field === "issueDate" ? error.message : undefined;
+  const globalError =
+    error && !error.field ? error.message : null;
+  const lineError =
+    error?.field && error.field.startsWith("lines[") ? error.message : null;
+  const bannerError = globalError ?? lineError;
 
   return (
     <div className="p-6 flex flex-col gap-6 max-w-4xl">
@@ -54,6 +81,12 @@ export default function NewDocumentPage() {
         </Link>
       </div>
 
+      {bannerError ? (
+        <p role="alert" className="text-sm text-danger">
+          {bannerError}
+        </p>
+      ) : null}
+
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-medium text-text-muted">Metadata</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -61,17 +94,20 @@ export default function NewDocumentPage() {
             label="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            error={titleFieldError}
           />
           <Input
             label="Customer"
             value={customer}
             onChange={(e) => setCustomer(e.target.value)}
+            error={customerFieldError}
           />
           <Input
             type="date"
             label="Issue date"
             value={issueDate}
             onChange={(e) => setIssueDate(e.target.value)}
+            error={issueDateFieldError}
           />
         </div>
       </section>
@@ -130,7 +166,9 @@ export default function NewDocumentPage() {
         >
           Cancel
         </Link>
-        <Button onClick={handleSave}>Save</Button>
+        <Button onClick={handleSave} loading={isPending}>
+          Save
+        </Button>
       </div>
     </div>
   );
