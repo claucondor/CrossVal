@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { apiFetch } from "../../../../lib/api";
+import { getErrorMessage } from "../../../../lib/error-messages";
 import type { DocumentResponse } from "../../../../lib/types";
 import Badge from "../../../../components/Badge";
 import DocumentTotals from "../../../../components/DocumentTotals";
@@ -9,67 +12,37 @@ import PrintButton from "./PrintButton";
 // layout de (app). La URL sigue siendo `/documents/[id]/print`, idéntica a
 // antes del movimiento; los `<Link>` que apuntan ahí no necesitan cambios.
 
-function getMockDocument(): DocumentResponse {
-  return {
-    id: "doc_002",
-    title: "Design retainer — Globex",
-    customer: "Globex Inc.",
-    issueDate: "2026-02-01",
-    status: "draft",
-    lines: [
-      {
-        id: "line_001",
-        description: "Brand exploration workshop",
-        quantity: 2,
-        unitPriceCents: 25000,
-        discount: null,
-        taxPercent: 7.5,
-        lineSubtotalCents: 50000,
-        discountAmountCents: 0,
-        taxAmountCents: 3750,
-        lineTotalCents: 53750,
-      },
-      {
-        id: "line_002",
-        description: "Logo concepts",
-        quantity: 5,
-        unitPriceCents: 6000,
-        discount: { type: "fixed", amountCents: 5000 },
-        taxPercent: 7.5,
-        lineSubtotalCents: 30000,
-        discountAmountCents: 5000,
-        taxAmountCents: 1875,
-        lineTotalCents: 26875,
-      },
-      {
-        id: "line_003",
-        description: "Style guide and tokens",
-        quantity: 1,
-        unitPriceCents: 18000,
-        discount: { type: "percent", percent: 10 },
-        taxPercent: 7.5,
-        lineSubtotalCents: 18000,
-        discountAmountCents: 1800,
-        taxAmountCents: 1215,
-        lineTotalCents: 17415,
-      },
-    ],
-    subtotalCents: 98000,
-    totalDiscountCents: 6800,
-    totalTaxCents: 6840,
-    grandTotalCents: 98040,
-    createdAt: "2026-02-01T09:30:00.000Z",
-    updatedAt: "2026-02-01T09:30:00.000Z",
-  };
-}
-
 export default async function PrintDocumentPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  void params;
-  const doc = getMockDocument();
+  const { id } = await params;
+  const result = await apiFetch<DocumentResponse>(`/documents/${id}`);
+
+  if (!result.ok) {
+    return (
+      <div className="print-root p-8 max-w-3xl mx-auto text-text">
+        <div className="no-print mb-6 flex items-center justify-end gap-2">
+          <Link
+            href="/documents"
+            className="inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-medium border border-border-strong bg-bg-subtle text-text hover:bg-bg"
+          >
+            Back to documents
+          </Link>
+          <PrintButton />
+        </div>
+        <div
+          role="alert"
+          className="border border-danger rounded-[6px] px-4 py-3 text-sm text-danger bg-bg-subtle"
+        >
+          {getErrorMessage(result.error.code)}
+        </div>
+      </div>
+    );
+  }
+
+  const doc = result.data;
 
   return (
     <div className="print-root p-8 max-w-3xl mx-auto text-text">
