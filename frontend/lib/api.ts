@@ -37,6 +37,10 @@ export async function apiFetch<T>(
     redirect("/login?expired=1");
   }
 
+  if (res.status === 204) {
+    return { ok: true, data: undefined as T };
+  }
+
   const json = (await res.json()) as unknown;
 
   if (res.ok) {
