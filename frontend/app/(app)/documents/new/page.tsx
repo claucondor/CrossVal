@@ -91,7 +91,11 @@ export default function NewDocumentPage() {
       ) : null}
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium text-text-muted">Metadata</h2>
+        <div className="border-b border-border pb-2">
+          <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
+            Metadata
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Title"
@@ -116,19 +120,21 @@ export default function NewDocumentPage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-text-muted">Lines</h2>
+        <div className="flex items-center justify-between border-b border-border pb-2">
+          <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
+            Lines
+          </h2>
           <Button variant="secondary" onClick={handleAddLine}>
             Add line
           </Button>
         </div>
-        <div className="grid grid-cols-12 gap-2 text-xs text-text-muted px-1">
+        <div className="grid grid-cols-12 gap-2 text-xs text-text-muted px-1 bg-bg-subtle border-b border-border pb-2">
           <div className="col-span-3">Description</div>
-          <div className="col-span-1">Qty</div>
-          <div className="col-span-2">Unit price</div>
+          <div className="col-span-1 text-right">Qty</div>
+          <div className="col-span-2 text-right">Unit price</div>
           <div className="col-span-2">Discount</div>
-          <div className="col-span-2">Disc. value</div>
-          <div className="col-span-1">Tax %</div>
+          <div className="col-span-2 text-right">Disc. value</div>
+          <div className="col-span-1 text-right">Tax %</div>
           <div className="col-span-1" />
         </div>
         {lines.length === 0 ? (
@@ -147,32 +153,28 @@ export default function NewDocumentPage() {
         )}
       </section>
 
-      <section className="flex flex-col gap-2 items-end">
+      <section className="flex flex-col gap-3 items-end">
         <p className="text-xs text-text-muted">
-          Totals shown below are placeholders. Real totals are returned by the
-          server after save (§4.3).
+          Totals are calculated by the server when you save
         </p>
-        <div className="w-full max-w-xs">
-          <DocumentTotals
-            subtotalCents={0}
-            totalDiscountCents={0}
-            totalTaxCents={0}
-            grandTotalCents={0}
-          />
+        <DocumentTotals
+          subtotalCents={0}
+          totalDiscountCents={0}
+          totalTaxCents={0}
+          grandTotalCents={0}
+        />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/documents"
+            className="inline-flex items-center justify-center rounded-[6px] px-4 py-2 text-sm font-medium border border-border-strong bg-bg-subtle text-text hover:bg-bg"
+          >
+            Cancel
+          </Link>
+          <Button onClick={handleSave} loading={isPending}>
+            Save
+          </Button>
         </div>
       </section>
-
-      <div className="flex items-center justify-end gap-2">
-        <Link
-          href="/documents"
-          className="inline-flex items-center justify-center rounded-[6px] px-4 py-2 text-sm font-medium border border-border-strong bg-bg-subtle text-text hover:bg-bg"
-        >
-          Cancel
-        </Link>
-        <Button onClick={handleSave} loading={isPending}>
-          Save
-        </Button>
-      </div>
     </div>
   );
 }

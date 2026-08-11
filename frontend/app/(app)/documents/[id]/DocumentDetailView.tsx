@@ -301,7 +301,11 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
       ) : null}
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium text-text-muted">Metadata</h2>
+        <div className="border-b border-border pb-2">
+          <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
+            Metadata
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Title"
@@ -332,8 +336,10 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
       </section>
 
       <section className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-text-muted">Lines</h2>
+        <div className="flex items-center justify-between border-b border-border pb-2">
+          <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
+            Lines
+          </h2>
           {isDraft ? (
             <Button
               variant="secondary"
@@ -357,13 +363,13 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
 
         {isDraft ? (
           <>
-            <div className="grid grid-cols-12 gap-2 text-xs text-text-muted px-1">
+            <div className="grid grid-cols-12 gap-2 text-xs text-text-muted px-1 bg-bg-subtle border-b border-border pb-2">
               <div className="col-span-3">Description</div>
-              <div className="col-span-1">Qty</div>
-              <div className="col-span-2">Unit price</div>
+              <div className="col-span-1 text-right">Qty</div>
+              <div className="col-span-2 text-right">Unit price</div>
               <div className="col-span-2">Discount</div>
-              <div className="col-span-2">Disc. value</div>
-              <div className="col-span-1">Tax %</div>
+              <div className="col-span-2 text-right">Disc. value</div>
+              <div className="col-span-1 text-right">Tax %</div>
               <div className="col-span-1" />
             </div>
             {localLines.length === 0 ? (
@@ -397,7 +403,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
           <div className="w-full overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-bg-subtle">
-                <tr>
+                <tr className="border-b border-border">
                   <th className="px-3 py-2 text-left font-medium text-text-muted">
                     Description
                   </th>
@@ -419,13 +425,13 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
                 {initialDoc.lines.map((line) => (
                   <tr key={line.id} className="border-b border-border">
                     <td className="px-3 py-2 text-text">{line.description}</td>
-                    <td className="px-3 py-2 text-right text-text">
+                    <td className="px-3 py-2 text-right text-text tabular-nums-col">
                       {line.quantity}
                     </td>
                     <td className="px-3 py-2 text-right text-text tabular-nums-col">
                       {formatCents(line.unitPriceCents)}
                     </td>
-                    <td className="px-3 py-2 text-right text-text">
+                    <td className="px-3 py-2 text-right text-text tabular-nums-col">
                       {line.taxPercent}
                     </td>
                     <td className="px-3 py-2 text-right text-text tabular-nums-col">
@@ -439,44 +445,41 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
         )}
       </section>
 
-      <section className="flex flex-col gap-2 items-end">
-        <div className="w-full max-w-xs">
-          <DocumentTotals
-            subtotalCents={initialDoc.subtotalCents}
-            totalDiscountCents={initialDoc.totalDiscountCents}
-            totalTaxCents={initialDoc.totalTaxCents}
-            grandTotalCents={initialDoc.grandTotalCents}
-          />
-        </div>
-      </section>
-
-      <div className="flex items-center gap-2">
-        {isDraft ? (
+      <section className="flex flex-col gap-3 items-end">
+        <DocumentTotals
+          subtotalCents={initialDoc.subtotalCents}
+          totalDiscountCents={initialDoc.totalDiscountCents}
+          totalTaxCents={initialDoc.totalTaxCents}
+          grandTotalCents={initialDoc.grandTotalCents}
+        />
+        <div className="flex items-center gap-2">
+          {isDraft ? (
+            <Button
+              onClick={() => setDialog("finalize")}
+              loading={isPending && pendingAction === "finalize"}
+              disabled={isPending}
+            >
+              Finalize
+            </Button>
+          ) : null}
           <Button
-            onClick={() => setDialog("finalize")}
-            loading={isPending && pendingAction === "finalize"}
+            variant="secondary"
+            onClick={() => setDialog("duplicate")}
+            loading={isPending && pendingAction === "duplicate"}
             disabled={isPending}
           >
-            Finalize
+            Duplicate
           </Button>
-        ) : null}
-        <Button
-          variant="secondary"
-          onClick={() => setDialog("duplicate")}
-          loading={isPending && pendingAction === "duplicate"}
-          disabled={isPending}
-        >
-          Duplicate
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => setDialog("delete")}
-          loading={isPending && pendingAction === "delete"}
-          disabled={isPending}
-        >
-          Delete
-        </Button>
-      </div>
+          <Button
+            variant="danger"
+            onClick={() => setDialog("delete")}
+            loading={isPending && pendingAction === "delete"}
+            disabled={isPending}
+          >
+            Delete
+          </Button>
+        </div>
+      </section>
 
       <ConfirmDialog
         open={dialog === "finalize"}
