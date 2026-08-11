@@ -137,16 +137,15 @@ export default function LineItemEditor({
         />
       </div>
       <div className="col-span-2">
-        {line.discount ? (
-          <Input
-            type="text"
-            inputMode={line.discount.type === "fixed" ? "decimal" : "decimal"}
-            aria-label="Discount value"
-            value={discountValue}
-            error={line.discount.type === "percent" ? discountPercentError ?? undefined : undefined}
-            onChange={(e) => handleDiscountValueChange(e.target.value)}
-          />
-        ) : null}
+        <Input
+          type="text"
+          inputMode={line.discount?.type === "fixed" ? "decimal" : "decimal"}
+          aria-label="Discount value"
+          value={line.discount ? discountValue : ""}
+          disabled={!line.discount}
+          error={line.discount?.type === "percent" ? discountPercentError ?? undefined : undefined}
+          onChange={(e) => handleDiscountValueChange(e.target.value)}
+        />
       </div>
       <div className="col-span-1">
         <Input
