@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import type { ZodTypeAny } from "zod";
-import { ERROR_STATUS, type AppErrorCode } from "../../../application/errors";
+import { ERROR_STATUS, ERROR_MESSAGES, type AppErrorCode } from "../../../application/errors";
 
 type Source = "body" | "params" | "query";
 
@@ -17,7 +17,7 @@ function codeForZodMessage(message: string): string {
     case "INVALID_DATE_RANGE":
       return "INVALID_DATE_RANGE";
     case "INVALID_DATE":
-      return "INVALID_DATE";
+      return "VALIDATION_ERROR";
     case "INVALID_PERCENT":
       return "INVALID_PERCENT";
     case "INVALID_DISCOUNT_SHAPE":
@@ -59,7 +59,7 @@ export function validate(source: Source, schema: ZodTypeAny) {
       res.status(ERROR_STATUS[code]).json({
         error: {
           code,
-          message: issue?.message ?? "Validation failed",
+          message: ERROR_MESSAGES[code],
           field,
         },
       });
