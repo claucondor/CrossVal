@@ -34,3 +34,33 @@ body {
 .tabular-nums-col {
   font-variant-numeric: tabular-nums;
 }
+
+/* Print styles — solo aplican a la vista imprimible de /documents/[id]/print.
+   La regla .no-print la usa el botón "Print" (oculto al imprimir). El resto
+   apunta por id/clase a los wrappers del documento, no a la cabecera de la
+   app (esta vista vive fuera del grupo (app), por lo que la cabecera
+   superior no existe aquí — ver app/documents/[id]/print/page.tsx). */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .print-root {
+    padding: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+}
