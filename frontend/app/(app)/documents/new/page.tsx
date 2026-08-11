@@ -82,9 +82,12 @@ export default function NewDocumentPage() {
       </div>
 
       {bannerError ? (
-        <p role="alert" className="text-sm text-danger">
+        <div
+          role="alert"
+          className="border border-danger rounded-[6px] px-4 py-3 text-sm text-danger bg-bg-subtle"
+        >
           {bannerError}
-        </p>
+        </div>
       ) : null}
 
       <section className="flex flex-col gap-4">

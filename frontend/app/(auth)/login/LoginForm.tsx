@@ -21,6 +21,14 @@ export default function LoginForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
+      {globalError ? (
+        <div
+          role="alert"
+          className="border border-danger rounded-[6px] px-4 py-3 text-sm text-danger bg-bg-subtle"
+        >
+          {globalError}
+        </div>
+      ) : null}
       <Input
         type="email"
         name="email"
@@ -37,11 +45,6 @@ export default function LoginForm() {
         autoComplete="current-password"
         error={passwordFieldError}
       />
-      {globalError ? (
-        <p role="alert" className="text-xs text-danger">
-          {globalError}
-        </p>
-      ) : null}
       <Button type="submit" loading={isPending}>
         Log in
       </Button>
