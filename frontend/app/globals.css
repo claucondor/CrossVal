@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:            oklch(1 0 0);
+  --bg-subtle:     oklch(0.967 0.001 286);  /* cabeceras de tabla, filas alternas */
+  --border:        oklch(0.920 0.004 286);
+  --border-strong: oklch(0.871 0.006 286);
+  --text:          oklch(0.210 0.006 286);
+  --text-muted:    oklch(0.552 0.016 286);
+  --accent:        oklch(0.510 0.190 262);  /* único acento: enlaces, botón primario, foco */
+  --danger:        oklch(0.510 0.190 27);   /* solo destructivo y errores */
+  --success:       oklch(0.520 0.140 150);  /* solo estado finalized */
+  --radius:        6px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg:            var(--bg);
+  --color-bg-subtle:     var(--bg-subtle);
+  --color-border:        var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text:          var(--text);
+  --color-text-muted:    var(--text-muted);
+  --color-accent:        var(--accent);
+  --color-danger:        var(--danger);
+  --color-success:       var(--success);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.tabular-nums-col {
+  font-variant-numeric: tabular-nums;
 }
