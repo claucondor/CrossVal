@@ -1,4 +1,4 @@
-// Las tres únicas funciones del frontend que tocan números de dinero.
+// Las funciones puras del frontend que tocan números de dinero/porcentaje.
 // Ver frontend-sdd.md §4.1 — regla crítica: el frontend NO hace aritmética
 // de negocio sobre dinero. Estas son funciones puras de formato/parseo.
 
@@ -24,4 +24,13 @@ export function parseCentsInput(raw: string): number | null {
 
 export function formatPercent(percent: number): string {
   return String(percent);
+}
+
+export function parsePercentInput(raw: string): number | null {
+  if (raw === "") return null;
+  if (!/^\d+(\.\d{1,2})?$/.test(raw)) return null;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return null;
+  if (parsed < 0 || parsed > 100) return null;
+  return parsed;
 }

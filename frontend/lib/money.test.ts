@@ -1,5 +1,10 @@
 import { describe, test, expect } from "vitest";
-import { formatCents, parseCentsInput, formatPercent } from "./money";
+import {
+  formatCents,
+  parseCentsInput,
+  formatPercent,
+  parsePercentInput,
+} from "./money";
 
 describe("formatCents", () => {
   test("42150 → '421.50'", () => {
@@ -56,5 +61,39 @@ describe("formatPercent", () => {
 
   test("0 → '0' (sin ceros decimales innecesarios)", () => {
     expect(formatPercent(0)).toBe("0");
+  });
+});
+
+describe("parsePercentInput", () => {
+  test("'7.25' → 7.25", () => {
+    expect(parsePercentInput("7.25")).toBe(7.25);
+  });
+
+  test("'0' → 0", () => {
+    expect(parsePercentInput("0")).toBe(0);
+  });
+
+  test("'100' → 100", () => {
+    expect(parsePercentInput("100")).toBe(100);
+  });
+
+  test("'7.333' → null (más de 2 decimales)", () => {
+    expect(parsePercentInput("7.333")).toBeNull();
+  });
+
+  test("'101' → null (fuera de rango)", () => {
+    expect(parsePercentInput("101")).toBeNull();
+  });
+
+  test("'-1' → null (negativo)", () => {
+    expect(parsePercentInput("-1")).toBeNull();
+  });
+
+  test("'abc' → null (no numérico)", () => {
+    expect(parsePercentInput("abc")).toBeNull();
+  });
+
+  test("'' → null (vacío)", () => {
+    expect(parsePercentInput("")).toBeNull();
   });
 });

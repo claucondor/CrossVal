@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Input from "./Input";
 import Select from "./Select";
 import Button from "./Button";
-import { formatCents, parseCentsInput } from "../lib/money";
+import { formatCents, parseCentsInput, parsePercentInput } from "../lib/money";
 import type { LineItemInput } from "../lib/types";
 
 interface Props {
@@ -29,6 +30,11 @@ export default function LineItemEditor({
     line.discount === null || line.discount === undefined
       ? "none"
       : line.discount.type;
+
+  const [discountPercentError, setDiscountPercentError] = useState<string | null>(null);
+  const [taxPercentError, setTaxPercentError] = useState<string | null>(null);
+
+  const percentErrorMessage = "Enter a percent between 0 and 100 with up to 2 decimals.";
 
   const handleDiscountTypeChange = (newType: string) => {
     if (newType === "none") {
@@ -57,12 +63,17 @@ export default function LineItemEditor({
         },
       });
     } else if (line.discount?.type === "percent") {
-      const parsed = parseFloat(newValue);
+      const parsed = parsePercentInput(newValue);
+      if (parsed === null) {
+        setDiscountPercentError(percentErrorMessage);
+        return;
+      }
+      setDiscountPercentError(null);
       onChange({
         ...line,
         discount: {
           type: "percent",
-          percent: Number.isFinite(parsed) ? parsed : line.discount.percent,
+          percent: parsed,
         },
       });
     }
@@ -132,6 +143,7 @@ export default function LineItemEditor({
             inputMode={line.discount.type === "fixed" ? "decimal" : "decimal"}
             aria-label="Discount value"
             value={discountValue}
+            error={line.discount.type === "percent" ? discountPercentError ?? undefined : undefined}
             onChange={(e) => handleDiscountValueChange(e.target.value)}
           />
         ) : null}
@@ -144,12 +156,19 @@ export default function LineItemEditor({
           max={100}
           aria-label="Tax percent"
           value={line.taxPercent ?? 0}
-          onChange={(e) =>
+          error={taxPercentError ?? undefined}
+          onChange={(e) => {
+            const parsed = parsePercentInput(e.target.value);
+            if (parsed === null) {
+              setTaxPercentError(percentErrorMessage);
+              return;
+            }
+            setTaxPercentError(null);
             onChange({
               ...line,
-              taxPercent: parseFloat(e.target.value) || 0,
-            })
-          }
+              taxPercent: parsed,
+            });
+          }}
         />
       </div>
       <div className="col-span-1 flex justify-end">
