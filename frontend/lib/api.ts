@@ -33,7 +33,9 @@ export async function apiFetch<T>(
     cache: "no-store",
   });
 
-  if (res.status === 401) {
+  const isAuthEndpoint = path.startsWith("/auth/");
+
+  if (res.status === 401 && !isAuthEndpoint) {
     cookieStore.delete("session");
     redirect("/login?expired=1");
   }
