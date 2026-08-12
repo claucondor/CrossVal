@@ -341,19 +341,6 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
             Lines
           </h2>
         </div>
-        {isDraft ? (
-          <div className="flex justify-end">
-            <Button
-              variant="secondary"
-              onClick={handleAddLine}
-              loading={isPending && pendingAction === "add-line"}
-              disabled={isPending}
-            >
-              Add line
-            </Button>
-          </div>
-        ) : null}
-
         {linesError ? (
           <div
             role="alert"
@@ -365,14 +352,14 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
 
         {isDraft ? (
           <>
-            <div className="grid grid-cols-12 gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
-              <div className="col-span-3">Description</div>
-              <div className="col-span-1 text-right">Qty</div>
-              <div className="col-span-2 text-right">Unit price</div>
-              <div className="col-span-2">Discount</div>
-              <div className="col-span-2 text-right">Disc. value</div>
-              <div className="col-span-1 text-right">Tax %</div>
-              <div className="col-span-1" />
+            <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
+              <div>Description</div>
+              <div className="text-right">Qty</div>
+              <div className="text-right">Unit price</div>
+              <div>Discount</div>
+              <div className="text-right">Disc. value</div>
+              <div className="text-right">Tax %</div>
+              <div />
             </div>
             {localLines.length === 0 ? (
               <p className="text-sm text-text-muted py-4">
@@ -400,50 +387,47 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
                 );
               })
             )}
+            <div className="flex justify-start">
+              <Button
+                variant="secondary"
+                onClick={handleAddLine}
+                loading={isPending && pendingAction === "add-line"}
+                disabled={isPending}
+              >
+                Add line
+              </Button>
+            </div>
           </>
         ) : (
-          <div className="w-full overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-bg-subtle">
-                <tr className="border-b border-border">
-                  <th className="px-3 py-2 text-left font-medium text-text-muted">
-                    Description
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-text-muted">
-                    Qty
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-text-muted">
-                    Unit price
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-text-muted">
-                    Tax %
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-text-muted">
-                    Line total
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {initialDoc.lines.map((line) => (
-                  <tr key={line.id} className="border-b border-border">
-                    <td className="px-3 py-2 text-text">{line.description}</td>
-                    <td className="px-3 py-2 text-right text-text tabular-nums-col">
-                      {line.quantity}
-                    </td>
-                    <td className="px-3 py-2 text-right text-text tabular-nums-col">
-                      {formatCents(line.unitPriceCents)}
-                    </td>
-                    <td className="px-3 py-2 text-right text-text tabular-nums-col">
-                      {line.taxPercent}
-                    </td>
-                    <td className="px-3 py-2 text-right text-text tabular-nums-col">
-                      {formatCents(line.lineTotalCents)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div className="grid grid-cols-[1fr_80px_120px_90px_300px] gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
+              <div>Description</div>
+              <div className="text-right">Qty</div>
+              <div className="text-right">Unit price</div>
+              <div className="text-right">Tax %</div>
+              <div className="text-right">Line total</div>
+            </div>
+            {initialDoc.lines.map((line) => (
+              <div
+                key={line.id}
+                className="grid grid-cols-[1fr_80px_120px_90px_300px] gap-2 items-center py-3 border-b border-border"
+              >
+                <div className="text-text">{line.description}</div>
+                <div className="text-right text-text tabular-nums">
+                  {line.quantity}
+                </div>
+                <div className="text-right text-text tabular-nums">
+                  {formatCents(line.unitPriceCents)}
+                </div>
+                <div className="text-right text-text tabular-nums">
+                  {line.taxPercent}
+                </div>
+                <div className="text-right text-text tabular-nums">
+                  {formatCents(line.lineTotalCents)}
+                </div>
+              </div>
+            ))}
+          </>
         )}
       </section>
 

@@ -125,19 +125,14 @@ export default function NewDocumentPage() {
             Lines
           </h2>
         </div>
-        <div className="flex justify-end">
-          <Button variant="secondary" onClick={handleAddLine}>
-            Add line
-          </Button>
-        </div>
-        <div className="grid grid-cols-12 gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
-          <div className="col-span-3">Description</div>
-          <div className="col-span-1 text-right">Qty</div>
-          <div className="col-span-2 text-right">Unit price</div>
-          <div className="col-span-2">Discount</div>
-          <div className="col-span-2 text-right">Disc. value</div>
-          <div className="col-span-1 text-right">Tax %</div>
-          <div className="col-span-1" />
+        <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
+          <div>Description</div>
+          <div className="text-right">Qty</div>
+          <div className="text-right">Unit price</div>
+          <div>Discount</div>
+          <div className="text-right">Disc. value</div>
+          <div className="text-right">Tax %</div>
+          <div />
         </div>
         {lines.length === 0 ? (
           <p className="text-sm text-text-muted py-4">
@@ -153,6 +148,11 @@ export default function NewDocumentPage() {
             />
           ))
         )}
+        <div className="flex justify-start">
+          <Button variant="secondary" onClick={handleAddLine}>
+            Add line
+          </Button>
+        </div>
       </section>
 
       <section className="flex flex-col gap-3 items-end">
