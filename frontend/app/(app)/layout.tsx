@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { logoutAction } from "../../actions/auth.actions";
+import Button from "../../components/Button";
 
 export default function AppLayout({
   children,
@@ -19,9 +20,7 @@ export default function AppLayout({
             </nav>
           </div>
           <form action={logoutAction}>
-            <button type="submit" className="text-sm">
-              Log out
-            </button>
+            <Button type="submit" variant="ghost">Log out</Button>
           </form>
         </div>
       </header>
