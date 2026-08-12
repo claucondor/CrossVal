@@ -70,7 +70,7 @@ export default function NewDocumentPage() {
   const bannerError = globalError ?? lineError;
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-4xl">
+    <div className="py-6 flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-text">New document</h1>
         <Link

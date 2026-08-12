@@ -3,7 +3,7 @@ import Skeleton from "../../../../components/Skeleton";
 export default function Loading() {
   return (
     <div
-      className="p-6 flex flex-col gap-6 max-w-4xl"
+      className="py-6 flex flex-col gap-6"
       aria-label="Loading document"
     >
       <div className="flex items-center gap-3">

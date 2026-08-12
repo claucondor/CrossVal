@@ -25,7 +25,7 @@ export default async function DocumentsPage({
 
   if (!result.ok) {
     return (
-      <div className="p-6 flex flex-col gap-4">
+      <div className="py-6 flex flex-col gap-4">
         <h1 className="text-2xl font-semibold text-text">Documents</h1>
         <p className="text-sm text-danger">
           {getErrorMessage(result.error.code)}
@@ -38,7 +38,7 @@ export default async function DocumentsPage({
 
   if (items.length === 0) {
     return (
-      <div className="p-6 flex flex-col gap-4">
+      <div className="py-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-text">Documents</h1>
         </div>

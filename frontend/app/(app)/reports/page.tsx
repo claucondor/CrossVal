@@ -23,7 +23,7 @@ export default async function ReportsPage({
       );
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-4xl">
+    <div className="py-6 flex flex-col gap-6">
       <h1 className="text-2xl font-semibold text-text">Reports</h1>
 
       <section className="flex flex-col gap-4">

@@ -9,21 +9,23 @@ export default function AppLayout({
 }>) {
   return (
     <div>
-      <header className="flex items-center justify-between border-b px-6 py-3">
-        <div className="flex items-center gap-6">
-          <span className="font-semibold">CrossVal</span>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/documents">Documents</Link>
-            <Link href="/reports">Reports</Link>
-          </nav>
+      <header className="border-b">
+        <div className="max-w-[1280px] mx-auto px-6 flex items-center justify-between py-3">
+          <div className="flex items-center gap-6">
+            <span className="font-semibold">CrossVal</span>
+            <nav className="flex items-center gap-4 text-sm">
+              <Link href="/documents">Documents</Link>
+              <Link href="/reports">Reports</Link>
+            </nav>
+          </div>
+          <form action={logoutAction}>
+            <button type="submit" className="text-sm">
+              Log out
+            </button>
+          </form>
         </div>
-        <form action={logoutAction}>
-          <button type="submit" className="text-sm">
-            Log out
-          </button>
-        </form>
       </header>
-      <main>{children}</main>
+      <main className="max-w-[1280px] mx-auto px-6">{children}</main>
     </div>
   );
 }
