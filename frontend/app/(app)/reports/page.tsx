@@ -1,3 +1,4 @@
+import Link from "next/link";
 import EmptyState from "../../../components/EmptyState";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
@@ -5,6 +6,49 @@ import { apiFetch } from "../../../lib/api";
 import { getErrorMessage } from "../../../lib/error-messages";
 import { formatCents } from "../../../lib/money";
 import type { SummaryReportResponse } from "../../../lib/types";
+
+type DateShortcut = { label: string; from: string; to: string };
+
+function formatUtcDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+function getDateRangeShortcuts(now: Date): DateShortcut[] {
+  const today = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+  const todayStr = formatUtcDate(today);
+  const y = today.getUTCFullYear();
+  const m = today.getUTCMonth();
+
+  return [
+    {
+      label: "This month",
+      from: formatUtcDate(new Date(Date.UTC(y, m, 1))),
+      to: todayStr,
+    },
+    {
+      label: "Last month",
+      from: formatUtcDate(new Date(Date.UTC(y, m - 1, 1))),
+      to: formatUtcDate(new Date(Date.UTC(y, m, 0))),
+    },
+    {
+      label: "Last 3 months",
+      from: formatUtcDate(new Date(Date.UTC(y, m - 2, 1))),
+      to: todayStr,
+    },
+    {
+      label: "Year to date",
+      from: formatUtcDate(new Date(Date.UTC(y, 0, 1))),
+      to: todayStr,
+    },
+    {
+      label: "Last year",
+      from: formatUtcDate(new Date(Date.UTC(y - 1, 0, 1))),
+      to: formatUtcDate(new Date(Date.UTC(y - 1, 11, 31))),
+    },
+  ];
+}
 
 export default async function ReportsPage({
   searchParams,
@@ -15,6 +59,8 @@ export default async function ReportsPage({
   const from = params.from ?? "";
   const to = params.to ?? "";
   const noRange = from === "" || to === "";
+
+  const shortcuts = getDateRangeShortcuts(new Date());
 
   const result = noRange
     ? null
@@ -28,14 +74,31 @@ export default async function ReportsPage({
 
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-label text-text-muted">Date range</h2>
-        <form method="get" action="/reports" className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md">
-            <Input type="date" name="from" label="From" defaultValue={from} />
-            <Input type="date" name="to" label="To" defaultValue={to} />
-          </div>
-          <div>
-            <Button type="submit">Generate</Button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {shortcuts.map((s) => {
+            const isActive = from === s.from && to === s.to;
+            const className = isActive
+              ? "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-[13px] font-label border border-accent bg-accent text-white"
+              : "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-[13px] font-label border border-border-strong bg-bg-subtle text-text hover:bg-bg";
+            return (
+              <Link
+                key={s.label}
+                href={`/reports?from=${s.from}&to=${s.to}`}
+                className={className}
+              >
+                {s.label}
+              </Link>
+            );
+          })}
+        </div>
+        <form
+          method="get"
+          action="/reports"
+          className="flex flex-wrap items-end gap-4"
+        >
+          <Input type="date" name="from" label="From" defaultValue={from} />
+          <Input type="date" name="to" label="To" defaultValue={to} />
+          <Button type="submit">Generate</Button>
         </form>
       </section>
 
