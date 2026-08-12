@@ -63,27 +63,34 @@ function ReportView({ report }: { report: SummaryReportResponse }) {
       <p className="text-sm text-text-muted">
         {report.from || "—"} → {report.to || "—"}
       </p>
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm border border-border rounded-[6px] p-4 bg-bg-subtle max-w-md">
-        <dt className="text-text-muted">Document count</dt>
-        <dd className="text-right tabular-nums-col text-text">
-          {report.documentCount}
-        </dd>
-
-        <dt className="text-text-muted">Grand total</dt>
-        <dd className="text-right tabular-nums-col text-text">
-          {formatCents(report.grandTotalCents)}
-        </dd>
-
-        <dt className="text-text-muted">Total tax</dt>
-        <dd className="text-right tabular-nums-col text-text">
-          {formatCents(report.totalTaxCents)}
-        </dd>
-
-        <dt className="text-text-muted">Total discount</dt>
-        <dd className="text-right tabular-nums-col text-text">
-          {formatCents(report.totalDiscountCents)}
-        </dd>
-      </dl>
+      <div className="border border-border rounded-[6px] p-4 max-w-md flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-label uppercase text-text-muted">
+            Grand total
+          </span>
+          <span className="text-[32px] font-mono font-body text-text">
+            {formatCents(report.grandTotalCents)}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-4 text-sm border-t border-border pt-3">
+          <div className="flex flex-col gap-1">
+            <span className="text-text-muted">Document count</span>
+            <span className="text-text tabular-nums">{report.documentCount}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-text-muted">Total tax</span>
+            <span className="text-text font-mono tabular-nums">
+              {formatCents(report.totalTaxCents)}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-text-muted">Total discount</span>
+            <span className="text-text font-mono tabular-nums">
+              {formatCents(report.totalDiscountCents)}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
