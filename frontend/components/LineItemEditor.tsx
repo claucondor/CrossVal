@@ -95,8 +95,8 @@ export default function LineItemEditor({
         : String(line.discount.percent);
 
   return (
-    <div className="grid grid-cols-12 gap-2 items-end py-3 border-b border-border">
-      <div className="col-span-3">
+    <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 items-end py-3 border-b border-border">
+      <div>
         <Input
           aria-label="Description"
           value={line.description}
@@ -105,10 +105,11 @@ export default function LineItemEditor({
           }
         />
       </div>
-      <div className="col-span-1">
+      <div>
         <Input
           type="number"
           min={1}
+          className="text-right tabular-nums"
           aria-label="Quantity"
           value={line.quantity}
           onChange={(e) =>
@@ -119,16 +120,17 @@ export default function LineItemEditor({
           }
         />
       </div>
-      <div className="col-span-2">
+      <div>
         <Input
           type="text"
           inputMode="decimal"
+          className="text-right tabular-nums"
           aria-label="Unit price"
           value={formatCents(line.unitPriceCents)}
           onChange={(e) => handleUnitPriceChange(e.target.value)}
         />
       </div>
-      <div className="col-span-2">
+      <div>
         <Select
           aria-label="Discount type"
           value={discountType}
@@ -136,10 +138,11 @@ export default function LineItemEditor({
           options={discountOptions}
         />
       </div>
-      <div className="col-span-2">
+      <div>
         <Input
           type="text"
           inputMode={line.discount?.type === "fixed" ? "decimal" : "decimal"}
+          className="text-right tabular-nums"
           aria-label="Discount value"
           value={line.discount ? discountValue : ""}
           disabled={!line.discount}
@@ -147,12 +150,13 @@ export default function LineItemEditor({
           onChange={(e) => handleDiscountValueChange(e.target.value)}
         />
       </div>
-      <div className="col-span-1">
+      <div>
         <Input
           type="number"
           step="0.01"
           min={0}
           max={100}
+          className="text-right tabular-nums"
           aria-label="Tax percent"
           value={line.taxPercent ?? 0}
           error={taxPercentError ?? undefined}
@@ -170,7 +174,7 @@ export default function LineItemEditor({
           }}
         />
       </div>
-      <div className="col-span-1 flex justify-end">
+      <div className="flex justify-end">
         <Button
           variant="ghost"
           onClick={onRemove}
