@@ -24,10 +24,10 @@ export default async function ReportsPage({
 
   return (
     <div className="py-6 flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-text">Reports</h1>
+      <h1 className="text-2xl font-label tracking-[-0.01em] text-text">Reports</h1>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium text-text-muted">Date range</h2>
+        <h2 className="text-sm font-label text-text-muted">Date range</h2>
         <form method="get" action="/reports" className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md">
             <Input type="date" name="from" label="From" defaultValue={from} />

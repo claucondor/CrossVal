@@ -16,7 +16,7 @@ export default function DocumentsError({
 
   return (
     <div className="p-12 flex flex-col items-center justify-center text-center gap-4">
-      <h2 className="text-lg font-semibold text-text">
+      <h2 className="text-lg font-label text-text">
         Something went wrong
       </h2>
       <p className="text-sm text-text-muted max-w-md">

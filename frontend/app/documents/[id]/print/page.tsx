@@ -26,7 +26,7 @@ export default async function PrintDocumentPage({
         <div className="no-print mb-6 flex items-center justify-end gap-2">
           <Link
             href="/documents"
-            className="inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-medium border border-border-strong bg-bg-subtle text-text hover:bg-bg"
+            className="inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-label border border-border-strong bg-bg-subtle text-text hover:bg-bg"
           >
             Back to documents
           </Link>
@@ -52,7 +52,7 @@ export default async function PrintDocumentPage({
 
       <header className="mb-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold">{doc.title}</h1>
+          <h1 className="text-3xl font-label">{doc.title}</h1>
           <Badge status={doc.status} />
         </div>
         <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
@@ -66,23 +66,23 @@ export default async function PrintDocumentPage({
       </header>
 
       <section className="mb-8">
-        <h2 className="text-sm font-medium text-text-muted mb-2">Lines</h2>
+        <h2 className="text-sm font-label text-text-muted mb-2">Lines</h2>
         <table className="w-full text-sm">
           <thead className="bg-bg-subtle">
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-text-muted">
+              <th className="px-3 py-2 text-left font-label text-text-muted">
                 Description
               </th>
-              <th className="px-3 py-2 text-right font-medium text-text-muted">
+              <th className="px-3 py-2 text-right font-label text-text-muted">
                 Qty
               </th>
-              <th className="px-3 py-2 text-right font-medium text-text-muted">
+              <th className="px-3 py-2 text-right font-label text-text-muted">
                 Unit price
               </th>
-              <th className="px-3 py-2 text-right font-medium text-text-muted">
+              <th className="px-3 py-2 text-right font-label text-text-muted">
                 Tax %
               </th>
-              <th className="px-3 py-2 text-right font-medium text-text-muted">
+              <th className="px-3 py-2 text-right font-label text-text-muted">
                 Line total
               </th>
             </tr>

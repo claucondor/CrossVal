@@ -17,7 +17,7 @@ export default function DocumentDetailError({
 
   return (
     <div className="p-12 flex flex-col items-center justify-center text-center gap-4">
-      <h2 className="text-lg font-semibold text-text">
+      <h2 className="text-lg font-label text-text">
         Something went wrong
       </h2>
       <p className="text-sm text-text-muted max-w-md">
@@ -26,9 +26,9 @@ export default function DocumentDetailError({
       <div className="flex items-center gap-2">
         <Link
           href="/documents"
-          className="inline-flex items-center justify-center rounded-[6px] px-4 py-2 text-sm font-medium border border-border-strong bg-bg-subtle text-text hover:bg-bg"
-        >
-          Back to documents
+className="inline-flex items-center justify-center rounded-[6px] px-4 py-2 text-sm font-label border border-border-strong bg-bg-subtle text-text hover:bg-bg"
+          >
+            Back to documents
         </Link>
         <Button onClick={reset}>Try again</Button>
       </div>

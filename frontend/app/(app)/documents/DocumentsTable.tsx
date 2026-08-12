@@ -15,7 +15,7 @@ interface Props {
 }
 
 const linkBase =
-  "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-medium border transition-colors";
+  "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-label border transition-colors";
 const linkEnabled =
   "bg-bg-subtle text-text border-border-strong hover:bg-bg";
 const linkDisabled =
@@ -56,10 +56,10 @@ export default function DocumentsTable({
   return (
     <div className="py-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-text">Documents</h1>
+        <h1 className="text-2xl font-label tracking-[-0.01em] text-text">Documents</h1>
         <Link
           href="/documents/new"
-          className="inline-flex items-center justify-center gap-2 rounded-[6px] px-4 py-2 text-sm font-medium bg-accent text-white border border-transparent hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="inline-flex items-center justify-center gap-2 rounded-[6px] px-4 py-2 text-sm font-label bg-accent text-white border border-transparent hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           New document
         </Link>

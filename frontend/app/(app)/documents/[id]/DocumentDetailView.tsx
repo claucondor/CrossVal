@@ -270,7 +270,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
             Documents
           </Link>
           <span className="text-text-muted">/</span>
-          <h1 className="text-2xl font-semibold text-text">
+          <h1 className="text-2xl font-label tracking-[-0.01em] text-text">
             {initialDoc.title}
           </h1>
           <Badge status={initialDoc.status} />
@@ -278,7 +278,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
         <div className="flex items-center gap-2">
           <Link
             href={`/documents/${initialDoc.id}/print`}
-            className="inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-medium border border-border-strong bg-bg-subtle text-text hover:bg-bg"
+            className="inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-sm font-label border border-border-strong bg-bg-subtle text-text hover:bg-bg"
           >
             Print view
           </Link>
@@ -302,7 +302,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
 
       <section className="flex flex-col gap-4">
         <div className="border-b border-border pb-2">
-          <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
+          <h2 className="text-xs font-label tracking-[0.04em] uppercase text-text-muted">
             Metadata
           </h2>
         </div>
@@ -337,7 +337,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
 
       <section className="flex flex-col gap-2">
         <div className="border-b border-border pb-2">
-          <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
+          <h2 className="text-xs font-label tracking-[0.04em] uppercase text-text-muted">
             Lines
           </h2>
         </div>
@@ -352,7 +352,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
 
         {isDraft ? (
           <>
-            <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
+            <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
               <div>Description</div>
               <div className="text-right">Qty</div>
               <div className="text-right">Unit price</div>
@@ -400,7 +400,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
           </>
         ) : (
           <>
-            <div className="grid grid-cols-[1fr_80px_120px_90px_300px] gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
+            <div className="grid grid-cols-[1fr_80px_120px_90px_300px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
               <div>Description</div>
               <div className="text-right">Qty</div>
               <div className="text-right">Unit price</div>

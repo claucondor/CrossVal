@@ -26,7 +26,7 @@ export default async function DocumentDetailPage({
     }
     return (
       <div className="p-6 flex flex-col gap-4 max-w-4xl">
-        <h1 className="text-2xl font-semibold text-text">Document</h1>
+        <h1 className="text-2xl font-label tracking-[-0.01em] text-text">Document</h1>
         <div
           role="alert"
           className="border border-danger rounded-[6px] px-4 py-3 text-sm text-danger bg-bg-subtle"

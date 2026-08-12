@@ -12,7 +12,7 @@ export default function AppLayout({
       <header className="border-b">
         <div className="max-w-[1280px] mx-auto px-6 flex items-center justify-between py-3">
           <div className="flex items-center gap-6">
-            <span className="font-semibold">CrossVal</span>
+            <span className="font-label">CrossVal</span>
             <nav className="flex items-center gap-4 text-sm">
               <Link href="/documents">Documents</Link>
               <Link href="/reports">Reports</Link>
