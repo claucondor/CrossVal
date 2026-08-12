@@ -282,6 +282,31 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
           >
             Print view
           </Link>
+          {isDraft ? (
+            <Button
+              onClick={() => setDialog("finalize")}
+              loading={isPending && pendingAction === "finalize"}
+              disabled={isPending}
+            >
+              Finalize
+            </Button>
+          ) : null}
+          <Button
+            variant="secondary"
+            onClick={() => setDialog("duplicate")}
+            loading={isPending && pendingAction === "duplicate"}
+            disabled={isPending}
+          >
+            Duplicate
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => setDialog("delete")}
+            loading={isPending && pendingAction === "delete"}
+            disabled={isPending}
+          >
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -307,31 +332,60 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Title"
-            defaultValue={initialDoc.title}
-            key={`title-${initialDoc.id}`}
-            disabled={!isDraft}
-            error={fieldErrors.title}
-            onBlur={handleTitleBlur}
-          />
-          <Input
-            label="Customer"
-            defaultValue={initialDoc.customer}
-            key={`customer-${initialDoc.id}`}
-            disabled={!isDraft}
-            error={fieldErrors.customer}
-            onBlur={handleCustomerBlur}
-          />
-          <Input
-            type="date"
-            label="Issue date"
-            defaultValue={initialDoc.issueDate}
-            key={`issueDate-${initialDoc.id}`}
-            disabled={!isDraft}
-            error={fieldErrors.issueDate}
-            onBlur={handleIssueDateBlur}
-          />
+          {isDraft ? (
+            <>
+              <Input
+                label="Title"
+                defaultValue={initialDoc.title}
+                key={`title-${initialDoc.id}`}
+                disabled={!isDraft}
+                error={fieldErrors.title}
+                onBlur={handleTitleBlur}
+              />
+              <Input
+                label="Customer"
+                defaultValue={initialDoc.customer}
+                key={`customer-${initialDoc.id}`}
+                disabled={!isDraft}
+                error={fieldErrors.customer}
+                onBlur={handleCustomerBlur}
+              />
+              <Input
+                type="date"
+                label="Issue date"
+                defaultValue={initialDoc.issueDate}
+                key={`issueDate-${initialDoc.id}`}
+                disabled={!isDraft}
+                error={fieldErrors.issueDate}
+                onBlur={handleIssueDateBlur}
+              />
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col gap-1">
+                <span className="text-[13px] font-label text-text-muted">
+                  Title
+                </span>
+                <span className="text-sm text-text">{initialDoc.title}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[13px] font-label text-text-muted">
+                  Customer
+                </span>
+                <span className="text-sm text-text">
+                  {initialDoc.customer}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[13px] font-label text-text-muted">
+                  Issue date
+                </span>
+                <span className="text-sm text-text">
+                  {initialDoc.issueDate}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -352,7 +406,8 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
 
         {isDraft ? (
           <>
-            <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
+            <div className="grid grid-cols-[32px_1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
+              <div />
               <div>Description</div>
               <div className="text-right">Qty</div>
               <div className="text-right">Unit price</div>
@@ -373,6 +428,7 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
                   <LineItemEditor
                     key={key}
                     line={line}
+                    index={idx + 1}
                     onChange={(next) => {
                       if (serverLine) {
                         handleLineChange(serverLine.id, next);
@@ -400,18 +456,22 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
           </>
         ) : (
           <>
-            <div className="grid grid-cols-[1fr_80px_120px_90px_300px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
+            <div className="grid grid-cols-[32px_1fr_80px_120px_90px_300px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
+              <div />
               <div>Description</div>
               <div className="text-right">Qty</div>
               <div className="text-right">Unit price</div>
               <div className="text-right">Tax %</div>
               <div className="text-right">Line total</div>
             </div>
-            {initialDoc.lines.map((line) => (
+            {initialDoc.lines.map((line, idx) => (
               <div
                 key={line.id}
-                className="grid grid-cols-[1fr_80px_120px_90px_300px] gap-2 items-center py-3 border-b border-border"
+                className="grid grid-cols-[32px_1fr_80px_120px_90px_300px] gap-2 items-center py-3 border-b border-border"
               >
+                <div className="text-right text-text-muted tabular-nums">
+                  {idx + 1}
+                </div>
                 <div className="text-text">{line.description}</div>
                 <div className="text-right text-text tabular-nums">
                   {line.quantity}
@@ -438,33 +498,6 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
           totalTaxCents={initialDoc.totalTaxCents}
           grandTotalCents={initialDoc.grandTotalCents}
         />
-        <div className="flex items-center gap-2">
-          {isDraft ? (
-            <Button
-              onClick={() => setDialog("finalize")}
-              loading={isPending && pendingAction === "finalize"}
-              disabled={isPending}
-            >
-              Finalize
-            </Button>
-          ) : null}
-          <Button
-            variant="secondary"
-            onClick={() => setDialog("duplicate")}
-            loading={isPending && pendingAction === "duplicate"}
-            disabled={isPending}
-          >
-            Duplicate
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => setDialog("delete")}
-            loading={isPending && pendingAction === "delete"}
-            disabled={isPending}
-          >
-            Delete
-          </Button>
-        </div>
       </section>
 
       <ConfirmDialog
