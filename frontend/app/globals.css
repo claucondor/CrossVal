@@ -7,7 +7,8 @@
   --border-strong: oklch(0.871 0.006 286);
   --text:          oklch(0.210 0.006 286);
   --text-muted:    oklch(0.552 0.016 286);
-  --accent:        oklch(0.510 0.190 262);  /* único acento: enlaces, botón primario, foco */
+  --accent:        oklch(0.45 0.10 160);    /* verde profundo, reemplaza el azul anterior */
+  --accent-hover:  oklch(0.41 0.10 160);    /* mismo tono/chroma, lightness 0.04 menor */
   --danger:        oklch(0.510 0.190 27);   /* solo destructivo y errores */
   --danger-subtle: oklch(0.965 0.025 27);   /* fondo del banner de error (§11) */
   --success:       oklch(0.520 0.140 150);  /* solo estado finalized */
@@ -22,11 +23,13 @@
   --color-text:          var(--text);
   --color-text-muted:    var(--text-muted);
   --color-accent:        var(--accent);
+  --color-accent-hover:  var(--accent-hover);
   --color-danger:        var(--danger);
   --color-danger-subtle: var(--danger-subtle);
   --color-success:       var(--success);
   --font-weight-body:    400;
   --font-weight-label:   510;
+  --font-mono:           var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 body {
