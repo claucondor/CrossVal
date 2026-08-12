@@ -23,6 +23,8 @@
   --color-accent:        var(--accent);
   --color-danger:        var(--danger);
   --color-success:       var(--success);
+  --font-weight-body:    400;
+  --font-weight-label:   510;
 }
 
 body {
