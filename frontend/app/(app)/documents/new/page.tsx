@@ -84,7 +84,7 @@ export default function NewDocumentPage() {
       {bannerError ? (
         <div
           role="alert"
-          className="border border-danger rounded-[6px] px-4 py-3 text-sm text-danger bg-bg-subtle"
+          className="border border-danger rounded-[6px] px-4 py-3 text-[13px] text-danger bg-danger-subtle"
         >
           {bannerError}
         </div>
