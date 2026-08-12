@@ -79,7 +79,7 @@ export default function Table<T>({
                       key={colIndex}
                       className={`px-3 py-2 min-h-[40px] ${
                         col.align === "right"
-                          ? "text-right tabular-nums-col"
+                          ? "text-right tabular-nums-col font-mono"
                           : "text-left"
                       }`}
                     >

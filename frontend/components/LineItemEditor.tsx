@@ -127,7 +127,7 @@ export default function LineItemEditor({
         <Input
           type="text"
           inputMode="decimal"
-          className="text-right tabular-nums"
+          className="text-right tabular-nums font-mono"
           aria-label="Unit price"
           value={formatCents(line.unitPriceCents)}
           onChange={(e) => handleUnitPriceChange(e.target.value)}
@@ -145,7 +145,7 @@ export default function LineItemEditor({
         <Input
           type="text"
           inputMode={line.discount?.type === "fixed" ? "decimal" : "decimal"}
-          className="text-right tabular-nums"
+          className="text-right tabular-nums font-mono"
           aria-label="Discount value"
           value={line.discount ? discountValue : ""}
           disabled={!line.discount}
@@ -159,7 +159,7 @@ export default function LineItemEditor({
           step="0.01"
           min={0}
           max={100}
-          className="text-right tabular-nums"
+          className="text-right tabular-nums font-mono"
           aria-label="Tax percent"
           value={line.taxPercent ?? 0}
           error={taxPercentError ?? undefined}

@@ -476,13 +476,13 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
                 <div className="text-right text-text tabular-nums">
                   {line.quantity}
                 </div>
-                <div className="text-right text-text tabular-nums">
+                <div className="text-right text-text tabular-nums font-mono">
                   {formatCents(line.unitPriceCents)}
                 </div>
-                <div className="text-right text-text tabular-nums">
+                <div className="text-right text-text tabular-nums font-mono">
                   {line.taxPercent}
                 </div>
-                <div className="text-right text-text tabular-nums">
+                <div className="text-right text-text tabular-nums font-mono">
                   {formatCents(line.lineTotalCents)}
                 </div>
               </div>

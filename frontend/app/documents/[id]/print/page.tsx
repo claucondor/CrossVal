@@ -94,13 +94,13 @@ export default async function PrintDocumentPage({
                 <td className="px-3 py-2 text-right text-text">
                   {line.quantity}
                 </td>
-                <td className="px-3 py-2 text-right text-text tabular-nums-col">
+                <td className="px-3 py-2 text-right text-text tabular-nums-col font-mono">
                   {formatCents(line.unitPriceCents)}
                 </td>
-                <td className="px-3 py-2 text-right text-text">
+                <td className="px-3 py-2 text-right text-text font-mono">
                   {line.taxPercent}
                 </td>
-                <td className="px-3 py-2 text-right text-text tabular-nums-col">
+                <td className="px-3 py-2 text-right text-text tabular-nums-col font-mono">
                   {formatCents(line.lineTotalCents)}
                 </td>
               </tr>

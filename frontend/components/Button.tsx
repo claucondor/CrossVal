@@ -11,7 +11,7 @@ interface Props extends ComponentProps<"button"> {
 
 const variantClass: Record<Variant, string> = {
   primary:
-    "bg-accent text-white border border-transparent hover:opacity-90",
+    "bg-accent text-white border border-transparent hover:bg-accent-hover",
   secondary:
     "bg-bg-subtle text-text border border-border-strong hover:bg-bg",
   danger:
