@@ -37,23 +37,10 @@ export default function Input({
         id={inputId}
         className={`${baseInputClass} ${borderClass} ${className ?? ""}`}
         aria-invalid={error ? "true" : undefined}
-        aria-describedby={
-          error
-            ? `${inputId}-error`
-            : hint
-              ? `${inputId}-hint`
-              : undefined
-        }
+        aria-describedby={!error && hint ? `${inputId}-hint` : undefined}
         {...rest}
       />
-      {error ? (
-        <p
-          id={`${inputId}-error`}
-          className="text-xs text-danger"
-        >
-          {error}
-        </p>
-      ) : hint ? (
+      {hint ? (
         <p
           id={`${inputId}-hint`}
           className="text-xs text-text-muted"

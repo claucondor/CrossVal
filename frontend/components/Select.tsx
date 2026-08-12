@@ -43,7 +43,6 @@ export default function Select({
         id={selectId}
         className={`${baseSelectClass} ${borderClass} ${className ?? ""}`}
         aria-invalid={error ? "true" : undefined}
-        aria-describedby={error ? `${selectId}-error` : undefined}
         {...rest}
       >
         {options.map((opt) => (
@@ -52,14 +51,6 @@ export default function Select({
           </option>
         ))}
       </select>
-      {error ? (
-        <p
-          id={`${selectId}-error`}
-          className="text-xs text-danger"
-        >
-          {error}
-        </p>
-      ) : null}
     </div>
   );
 }

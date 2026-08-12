@@ -16,17 +16,22 @@ export default function LoginForm() {
     state.error?.field === "email" ? state.error.message : undefined;
   const passwordFieldError =
     state.error?.field === "password" ? state.error.message : undefined;
-  const globalError =
-    state.error && !state.error.field ? state.error.message : null;
+  const bannerError = state.error
+    ? state.error.field === "email"
+      ? `Email: ${state.error.message}`
+      : state.error.field === "password"
+        ? `Password: ${state.error.message}`
+        : state.error.message
+    : null;
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      {globalError ? (
+      {bannerError ? (
         <div
           role="alert"
           className="border border-danger rounded-[6px] px-4 py-3 text-[13px] text-danger bg-danger-subtle"
         >
-          {globalError}
+          {bannerError}
         </div>
       ) : null}
       <Input

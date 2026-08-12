@@ -67,7 +67,12 @@ export default function NewDocumentPage() {
     error && !error.field ? error.message : null;
   const lineError =
     error?.field && error.field.startsWith("lines[") ? error.message : null;
-  const bannerError = globalError ?? lineError;
+  const bannerError =
+    globalError ??
+    lineError ??
+    (titleFieldError ? `Title: ${titleFieldError}` : null) ??
+    (customerFieldError ? `Customer: ${customerFieldError}` : null) ??
+    (issueDateFieldError ? `Issue date: ${issueDateFieldError}` : null);
 
   return (
     <div className="py-6 flex flex-col gap-6">

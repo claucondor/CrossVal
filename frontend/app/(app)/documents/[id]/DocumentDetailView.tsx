@@ -259,6 +259,12 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
     runAction("duplicate", () => duplicateDocumentAction(initialDoc.id));
   };
 
+  const metadataBanner =
+    metadataError ??
+    (fieldErrors.title ? `Title: ${fieldErrors.title}` : null) ??
+    (fieldErrors.customer ? `Customer: ${fieldErrors.customer}` : null) ??
+    (fieldErrors.issueDate ? `Issue date: ${fieldErrors.issueDate}` : null);
+
   return (
     <div className="py-6 flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -316,12 +322,12 @@ export default function DocumentDetailView({ document: initialDoc }: Props) {
         </div>
       ) : null}
 
-      {metadataError ? (
+      {metadataBanner ? (
         <div
           role="alert"
           className="border border-danger rounded-[6px] px-4 py-3 text-[13px] text-danger bg-danger-subtle"
         >
-          {metadataError}
+          {metadataBanner}
         </div>
       ) : null}
 
