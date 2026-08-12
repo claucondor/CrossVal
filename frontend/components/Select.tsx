@@ -34,7 +34,7 @@ export default function Select({
       {label ? (
         <label
           htmlFor={selectId}
-          className="text-sm font-medium text-text"
+          className="text-[13px] font-label text-text"
         >
           {label}
         </label>

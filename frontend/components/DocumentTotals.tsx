@@ -31,10 +31,10 @@ export default function DocumentTotals({
           {formatCents(totalTaxCents)}
         </dd>
 
-        <dt className="text-text font-semibold pt-2 border-t border-border-strong">
+        <dt className="text-text font-label pt-2 border-t border-border-strong">
           Total
         </dt>
-        <dd className="text-right tabular-nums-col text-text font-semibold pt-2 border-t border-border-strong">
+        <dd className="text-right tabular-nums-col text-text font-label pt-2 border-t border-border-strong">
           {formatCents(grandTotalCents)}
         </dd>
       </dl>

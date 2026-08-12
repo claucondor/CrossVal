@@ -45,7 +45,7 @@ export default function Table<T>({
               <th
                 key={i}
                 scope="col"
-                className={`px-3 py-2 font-medium text-text-muted ${
+                className={`px-3 py-2 font-label text-text-muted ${
                   col.align === "right" ? "text-right" : "text-left"
                 }`}
               >

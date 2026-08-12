@@ -28,7 +28,7 @@ export default function Input({
       {label ? (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-text"
+          className="text-[13px] font-label text-text"
         >
           {label}
         </label>
