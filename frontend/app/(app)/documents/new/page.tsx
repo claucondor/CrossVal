@@ -120,15 +120,17 @@ export default function NewDocumentPage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <div className="flex items-center justify-between border-b border-border pb-2">
+        <div className="border-b border-border pb-2">
           <h2 className="text-[13px] font-medium tracking-[0.04em] uppercase text-text">
             Lines
           </h2>
+        </div>
+        <div className="flex justify-end">
           <Button variant="secondary" onClick={handleAddLine}>
             Add line
           </Button>
         </div>
-        <div className="grid grid-cols-12 gap-2 text-xs text-text-muted px-1 bg-bg-subtle border-b border-border pb-2">
+        <div className="grid grid-cols-12 gap-2 text-xs text-text-muted bg-bg-subtle border-b border-border pb-2">
           <div className="col-span-3">Description</div>
           <div className="col-span-1 text-right">Qty</div>
           <div className="col-span-2 text-right">Unit price</div>
