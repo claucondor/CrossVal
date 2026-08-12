@@ -11,6 +11,7 @@ interface Props {
   line: LineItemInput;
   onChange: (line: LineItemInput) => void;
   onRemove: () => void;
+  index?: number;
 }
 
 type DiscountType = "none" | "fixed" | "percent";
@@ -25,6 +26,7 @@ export default function LineItemEditor({
   line,
   onChange,
   onRemove,
+  index,
 }: Props) {
   const discountType: DiscountType =
     line.discount === null || line.discount === undefined
@@ -95,7 +97,8 @@ export default function LineItemEditor({
         : String(line.discount.percent);
 
   return (
-    <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 items-end py-3 border-b border-border">
+    <div className="grid grid-cols-[32px_1fr_80px_120px_140px_120px_90px_40px] gap-2 items-end py-3 border-b border-border">
+      <div className="text-right text-text-muted tabular-nums">{index}</div>
       <div>
         <Input
           aria-label="Description"
