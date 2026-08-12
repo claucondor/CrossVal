@@ -72,50 +72,52 @@ export default async function ReportsPage({
     <div className="py-6 flex flex-col gap-6">
       <h1 className="text-2xl font-label tracking-[-0.01em] text-text">Reports</h1>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-label text-text-muted">Date range</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          {shortcuts.map((s) => {
-            const isActive = from === s.from && to === s.to;
-            const className = isActive
-              ? "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-[13px] font-label border border-accent bg-accent text-white"
-              : "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-[13px] font-label border border-border-strong bg-bg-subtle text-text hover:bg-bg";
-            return (
-              <Link
-                key={s.label}
-                href={`/reports?from=${s.from}&to=${s.to}`}
-                className={className}
-              >
-                {s.label}
-              </Link>
-            );
-          })}
-        </div>
-        <form
-          method="get"
-          action="/reports"
-          className="flex flex-wrap items-end gap-4"
-        >
-          <Input type="date" name="from" label="From" defaultValue={from} />
-          <Input type="date" name="to" label="To" defaultValue={to} />
-          <Button type="submit">Generate</Button>
-        </form>
-      </section>
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 items-start">
+        <section className="flex flex-col gap-4">
+          <h2 className="text-sm font-label text-text-muted">Date range</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            {shortcuts.map((s) => {
+              const isActive = from === s.from && to === s.to;
+              const className = isActive
+                ? "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-[13px] font-label border border-accent bg-accent text-white"
+                : "inline-flex items-center justify-center rounded-[6px] px-3 py-1.5 text-[13px] font-label border border-border-strong bg-bg-subtle text-text hover:bg-bg";
+              return (
+                <Link
+                  key={s.label}
+                  href={`/reports?from=${s.from}&to=${s.to}`}
+                  className={className}
+                >
+                  {s.label}
+                </Link>
+              );
+            })}
+          </div>
+          <form
+            method="get"
+            action="/reports"
+            className="flex flex-wrap items-end gap-4"
+          >
+            <Input type="date" name="from" label="From" defaultValue={from} />
+            <Input type="date" name="to" label="To" defaultValue={to} />
+            <Button type="submit">Generate</Button>
+          </form>
+        </section>
 
-      <section>
-        {noRange ? (
-          <EmptyState
-            title="No report yet"
-            description="Pick a date range and click Generate to view metrics."
-          />
-        ) : result === null ? null : !result.ok ? (
-          <p className="text-sm text-danger">
-            {getErrorMessage(result.error.code)}
-          </p>
-        ) : (
-          <ReportView report={result.data} />
-        )}
-      </section>
+        <section>
+          {noRange ? (
+            <EmptyState
+              title="No report yet"
+              description="Pick a date range and click Generate to view metrics."
+            />
+          ) : result === null ? null : !result.ok ? (
+            <p className="text-sm text-danger">
+              {getErrorMessage(result.error.code)}
+            </p>
+          ) : (
+            <ReportView report={result.data} />
+          )}
+        </section>
+      </div>
     </div>
   );
 }
