@@ -125,7 +125,8 @@ export default function NewDocumentPage() {
             Lines
           </h2>
         </div>
-        <div className="grid grid-cols-[1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
+        <div className="grid grid-cols-[32px_1fr_80px_120px_140px_120px_90px_40px] gap-2 text-xs text-text-muted font-label bg-bg-subtle border-b border-border pb-2">
+          <div />
           <div>Description</div>
           <div className="text-right">Qty</div>
           <div className="text-right">Unit price</div>
@@ -143,6 +144,7 @@ export default function NewDocumentPage() {
             <LineItemEditor
               key={idx}
               line={line}
+              index={idx + 1}
               onChange={(next) => handleLineChange(idx, next)}
               onRemove={() => handleLineRemove(idx)}
             />
