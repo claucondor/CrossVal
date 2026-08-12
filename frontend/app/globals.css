@@ -9,6 +9,7 @@
   --text-muted:    oklch(0.552 0.016 286);
   --accent:        oklch(0.510 0.190 262);  /* único acento: enlaces, botón primario, foco */
   --danger:        oklch(0.510 0.190 27);   /* solo destructivo y errores */
+  --danger-subtle: oklch(0.965 0.025 27);   /* fondo del banner de error (§11) */
   --success:       oklch(0.520 0.140 150);  /* solo estado finalized */
   --radius:        6px;
 }
@@ -22,6 +23,7 @@
   --color-text-muted:    var(--text-muted);
   --color-accent:        var(--accent);
   --color-danger:        var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
   --color-success:       var(--success);
   --font-weight-body:    400;
   --font-weight-label:   510;
